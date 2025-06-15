@@ -16,6 +16,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Verify from "./pages/Verify";
 import UnderConstruction from "./pages/UnderConstruction";
+import VerifiedDashboard from "./pages/VerifiedDashboard.jsx";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
         <Route path="/orders" element={<Orders />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/underconstruction" element={<UnderConstruction />} />
+        <Route path="/verifieddashboard" element={<VerifiedDashboard />} />
       </Routes>
       <Footer />
     </div>
