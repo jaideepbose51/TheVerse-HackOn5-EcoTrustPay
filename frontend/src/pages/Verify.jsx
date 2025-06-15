@@ -40,4 +40,4 @@ const Verify = () => {
   return <div></div>;
 };
 
-export default Verify;
+export default Verify

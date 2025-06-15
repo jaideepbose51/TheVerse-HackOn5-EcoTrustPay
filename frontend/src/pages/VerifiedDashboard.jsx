@@ -109,10 +109,10 @@ const VerifiedDashboard = () => {
                     o.status === "verified" ? "text-green-600" : "text-red-500"
                   }`}
                 >
-                  {o.status === "verified" ? "Verified ✅" : "Flagged 🚩"}
+                  {o.status === "verified" ? "Verified" : "Flagged"}
                 </td>
                 <td className="p-3">{o.co2Saved}</td>
-                <td className="p-3">{o.grouped ? "Yes 📦" : "No"}</td>
+                <td className="p-3">{o.grouped ? "Yes" : "No"}</td>
                 <td className="p-3">{o.groupCO2Saved}</td>
               </tr>
             ))}
