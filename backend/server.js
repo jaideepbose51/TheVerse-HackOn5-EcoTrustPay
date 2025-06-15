@@ -4,12 +4,13 @@ import cors from "cors";
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
 
+import adminRouter from "./routes/adminRoute.js";
 import userRouter from "./routes/userRoute.js";
 import sellerRouter from "./routes/sellerRoute.js";
-import adminRouter from "./routes/adminRoute.js";
-import productRouter from "./routes/productRoute.js";
-import cartRouter from "./routes/cartRoute.js";
-import orderRouter from "./routes/orderRoute.js";
+
+// import productRouter from "./routes/productRoute.js";
+// import cartRouter from "./routes/cartRoute.js";
+// import orderRouter from "./routes/orderRoute.js";
 
 // App Config
 const app = express();
@@ -29,9 +30,9 @@ app.use((req, res, next) => {
 app.use('/api/user', userRouter);
 app.use('/api/seller', sellerRouter);
 app.use('/api/admin', adminRouter);
-app.use('/api/product', productRouter);
-app.use('/api/cart', cartRouter);
-app.use('/api/order', orderRouter);
+// app.use('/api/product', productRouter);
+// app.use('/api/cart', cartRouter);
+// app.use('/api/order', orderRouter);
 
 // Health Check
 app.get("/", (req, res) => {
