@@ -30,7 +30,9 @@ const About = () => {
             spotting suspicious seller activity, EcoTrust Pay ensures
             eco-products are truly what they claim to be.
           </p>
-          <b className="text-gray-800">Our Mission</b>
+          <div className="text-2xl text-center pt-8 border-t">
+            <Title text1={"OUR"} text2={"MISSION"} />
+          </div>
           <p>
             To empower customers with verified sustainable choices, reduce
             greenwashing, and support eco-conscious shopping at scale. We
