@@ -1,28 +1,36 @@
-import jwt from 'jsonwebtoken';
-import Seller from '../models/sellerModel.js';
+// middleware/authSeller.js
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import Seller from "../model/sellerModel.js";
 
-export const authSeller = async (req, res, next) => {
+dotenv.config();
+
+const authSeller = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized: No token provided" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ success: false, message: "No token provided" });
     }
 
+    const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const seller = await Seller.findById(decoded.id);
 
+    if (decoded.role !== "seller") {
+      return res.status(403).json({ success: false, message: "Unauthorized role" });
+    }
+
+    const seller = await Seller.findById(decoded.id).select("-password");
     if (!seller) {
-      return res.status(404).json({ message: "Seller not found" });
+      return res.status(404).json({ success: false, message: "Seller not found" });
     }
 
-    if (seller.status !== 'verified') {
-      return res.status(403).json({ message: "Seller not verified by admin" });
-    }
-
-    req.user = { id: seller._id }; // Attach seller ID for use in controllers
-    next();
+    req.seller = seller; // ✅ Attach seller to request
+    next(); // ✅ Do not block here
   } catch (err) {
-    res.status(401).json({ message: "Invalid or expired token" });
+    console.error("Seller auth error:", err.message);
+    res.status(401).json({ success: false, message: "Invalid or expired token" });
   }
 };
+
+export default authSeller;

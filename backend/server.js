@@ -1,6 +1,9 @@
+// server.js
 import express from "express";
 import 'dotenv/config';
 import cors from "cors";
+import morgan from "morgan";
+
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
 
@@ -8,45 +11,38 @@ import adminRouter from "./routes/adminRoute.js";
 import userRouter from "./routes/userRoute.js";
 import sellerRouter from "./routes/sellerRoute.js";
 
-// import productRouter from "./routes/productRoute.js";
-// import cartRouter from "./routes/cartRoute.js";
-// import orderRouter from "./routes/orderRoute.js";
-
-// App Config
+// Initialize App
 const app = express();
 const port = process.env.PORT || 4000;
 
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(morgan("dev")); // Better logging in dev
 
-// Optional: Logger middleware
-app.use((req, res, next) => {
-    console.log(`➡️  ${req.method} ${req.url}`);
-    next();
-});
+// Routes
+app.use("/api/user", userRouter);
+app.use("/api/seller", sellerRouter);
+app.use("/api/admin", adminRouter);
 
-// API Routes
-app.use('/api/user', userRouter);
-app.use('/api/seller', sellerRouter);
-app.use('/api/admin', adminRouter);
-// app.use('/api/product', productRouter);
-// app.use('/api/cart', cartRouter);
-// app.use('/api/order', orderRouter);
-
-// Health Check
+// Health check
 app.get("/", (req, res) => {
-    res.send("✅ API is working");
+    res.status(200).send("✅ API is working");
 });
 
-// Start server after DB and Cloudinary are ready
+// Start server only after DB & Cloudinary connect
 const startServer = async () => {
-    await connectDB();
-    await connectCloudinary();
+    try {
+        await connectDB();
+        await connectCloudinary();
 
-    app.listen(port, () => {
-        console.log(`🚀 Server running on port ${port}`);
-    });
+        app.listen(port, () => {
+            console.log(`🚀 Server is running on http://localhost:${port}`);
+        });
+    } catch (error) {
+        console.error("❌ Error starting server:", error);
+        process.exit(1);
+    }
 };
 
 startServer();

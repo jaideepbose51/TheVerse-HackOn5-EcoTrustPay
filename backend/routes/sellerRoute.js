@@ -1,28 +1,51 @@
+// sellerRoute.js
 import express from 'express';
+import multer from 'multer';
 import {
   registerSeller,
   loginSeller,
   getSellerProfile,
-  addAdvancedSellerDetails,
+  addAdvancedSellerDetails
+} from '../controller/sellerController.js';
+import {
   createCatalogue,
   getCatalogues
-} from '../controllers/sellerController.js';
-import multer from 'multer';
-import { authSeller } from '../middleware/authSeller.js';
+} from '../controller/catalogueController.js';
+import { isSeller } from '../middleware/auth.js';
 
-const sellerRouter = express.Router();
-const upload = multer({ dest: 'uploads/' });
+const router = express.Router();
 
-// Auth Routes
-sellerRouter.post('/register', registerSeller);
-sellerRouter.post('/login', loginSeller);
-sellerRouter.get('/profile', authSeller, getSellerProfile);
+// ✅ One single multer instance for everything
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// Add Advanced Info
-sellerRouter.put('/details', authSeller, addAdvancedSellerDetails);
+// Seller docs upload (advanced details)
+const sellerDocsUpload = upload.fields([
+  { name: 'shopImages', maxCount: 5 },
+  { name: 'brandAssociations', maxCount: 5 },
+  { name: 'purchaseBills', maxCount: 5 }
+]);
 
-// Catalogue Routes
-sellerRouter.post('/catalogue', authSeller, upload.array('images', 50), createCatalogue);
-sellerRouter.get('/catalogue', authSeller, getCatalogues);
+// 🔁 Routes
+router.post('/register', registerSeller);
+router.post('/login', loginSeller);
+router.get('/profile', isSeller, getSellerProfile);
+router.put('/details', isSeller, sellerDocsUpload, addAdvancedSellerDetails);
 
-export default sellerRouter;
+router.use((req, res, next) => {
+  console.log('🧪 Incoming content-type:', req.headers['content-type']);
+  next();
+});
+
+
+// ✅ Catalogue upload
+router.post(
+  '/catalogue',
+  isSeller,
+  upload.fields([{ name: 'images', maxCount: 50 }]),
+  createCatalogue
+);
+
+router.get('/catalogue', isSeller, getCatalogues);
+
+export default router;

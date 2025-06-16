@@ -1,26 +1,31 @@
-import express from 'express'
-import { registerUser, login, getProfile } from "../controllers/userController.js"
+import express from 'express';
+import {
+  registerUser,
+  loginUser,
+  getUserProfile,
+  addToCart,
+  removeFromCart,
+  placeOrder,
+  getOrders,
+  getAllProducts
+} from '../controller/userController.js';
+import authUser from '../middleware/authUser.js';
 
-const userRouter = express.Router()
+const userRouter = express.Router();
 
-userRouter.post("/register", registerUser);
-userRouter.post("/login", login);
-// userRouter.get("/get-profile", authUser, getProfile);
+// 📦 Show all available products
+userRouter.get("/", getAllProducts);
 
-// cartRouter.post('/get', authUser, getUserCart)
-// cartRouter.post('/add', authUser, addToCart)
-// cartRouter.post('/update', authUser, updateCart)
+userRouter.post('/register', registerUser);
+userRouter.post('/login', loginUser);
+userRouter.get('/profile', authUser, getUserProfile);
 
-// // Payment Features
-// orderRouter.post('/place', authUser, placeOrder)
-// orderRouter.post('/stripe', authUser, placeOrderStripe)
-// orderRouter.post('/razorpay', authUser, placeOrderRazorpay)
+// 🛒 Cart routes
+userRouter.post('/cart/add', authUser, addToCart);
+userRouter.post('/cart/remove', authUser, removeFromCart);
 
-// // User Feature
-// orderRouter.post('/userorders', authUser, userOders)
+// 🧾 Order routes
+userRouter.post('/order', authUser, placeOrder);
+userRouter.get('/orders', authUser, getOrders);
 
-// //verify payment
-// orderRouter.post('/verifyStripe', authUser, verifyStripe)
-// userRouter.post("/pay-online",authUser,payOnline);
-
-export default userRouter
+export default userRouter;

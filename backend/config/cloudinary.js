@@ -1,23 +1,22 @@
+// config/cloudinary.js
 import { v2 as cloudinary } from "cloudinary";
 
 const connectCloudinary = async () => {
     try {
+        const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+
+        if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+            console.warn("⚠️ Cloudinary environment variables are missing or incomplete.");
+            return;
+        }
+
         cloudinary.config({
-            cloud_name: process.env.CLOUDINARY_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret: process.env.CLOUDINARY_SECRET_KEY
+            cloud_name: CLOUDINARY_CLOUD_NAME,
+            api_key: CLOUDINARY_API_KEY,
+            api_secret: CLOUDINARY_API_SECRET,
         });
 
-        // Simple check to validate config
-        if (
-            cloudinary.config().cloud_name &&
-            cloudinary.config().api_key &&
-            cloudinary.config().api_secret
-        ) {
-            console.log("✅ Cloudinary configured successfully.");
-        } else {
-            console.warn("⚠️ Cloudinary configuration seems incomplete.");
-        }
+        console.log("✅ Cloudinary configured successfully.");
     } catch (error) {
         console.error("❌ Error configuring Cloudinary:", error);
     }

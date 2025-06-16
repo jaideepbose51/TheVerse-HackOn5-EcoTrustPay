@@ -2,23 +2,20 @@ import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  description: { type: String },
+  description: String,
   price: { type: Number, required: true },
   images: {
     type: [String],
-    required: true,
     validate: {
-      validator: function (val) {
-        return Array.isArray(val) && val.length === 5;
-      },
-      message: 'Each product must have exactly 5 images.'
+      validator: val => val.length === 5,
+      message: 'Exactly 5 images required.'
     }
   },
-  sizes: { type: [String] },
+  sizes: [String],
   inStock: { type: Boolean, default: true },
   quantity: { type: Number, default: 0 },
   bestseller: { type: Boolean, default: false },
-  date: { type: Number, required: true }
+  date: { type: Date, default: Date.now } // ✅ corrected
 });
 
 const catalogueSchema = new mongoose.Schema({
@@ -30,10 +27,10 @@ const catalogueSchema = new mongoose.Schema({
   name: { type: String, required: true },
   category: {
     type: String,
-    enum: ['electronics', 'fashion', 'home', 'books', 'beauty', 'sports'],
-    required: true
+    enum: ["Electronics", "Clothing", "Home", "Beauty", "Fashion"]
   },
   subCategory: { type: String, required: true },
+  date: { type: Date, default: Date.now }, // ✅ corrected
   products: [productSchema]
 }, { timestamps: true });
 

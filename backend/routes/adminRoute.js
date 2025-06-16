@@ -4,22 +4,27 @@ import {
   getPendingSellers,
   verifySeller,
   getAllSellers,
-  getAllCatalogues
-} from '../controllers/adminController.js';
-import authAdmin from '../middleware/adminAuth.js';
-
+  getAllCatalogues,
+  blockSeller,
+  unblockSeller,
+  exportSellersCSV,
+  exportCataloguesCSV
+} from '../controller/adminController.js';
+import authAdmin from '../middleware/authAdmin.js';
 
 const adminRouter = express.Router();
 
-// Login
 adminRouter.post("/login", adminLogin);
 
-// Seller Management
 adminRouter.get("/sellers/pending", authAdmin, getPendingSellers);
-adminRouter.put("/sellers/verify", authAdmin, verifySeller);
 adminRouter.get("/sellers", authAdmin, getAllSellers);
+adminRouter.put("/sellers/verify/:sellerId", authAdmin, verifySeller);
+adminRouter.put("/sellers/block/:sellerId", authAdmin, blockSeller);
+adminRouter.put("/sellers/unblock/:sellerId", authAdmin, unblockSeller);
 
-// Catalogue Monitoring
 adminRouter.get("/catalogues", authAdmin, getAllCatalogues);
+
+adminRouter.get("/reports/sellers", authAdmin, exportSellersCSV);
+adminRouter.get("/reports/catalogues", authAdmin, exportCataloguesCSV);
 
 export default adminRouter;
