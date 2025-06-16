@@ -1,51 +1,46 @@
-// sellerRoute.js
-import express from 'express';
-import multer from 'multer';
+import express from "express";
+import multer from "multer";
 import {
   registerSeller,
   loginSeller,
   getSellerProfile,
-  addAdvancedSellerDetails
-} from '../controller/sellerController.js';
-import {
-  createCatalogue,
-  getCatalogues
-} from '../controller/catalogueController.js';
-import { isSeller } from '../middleware/auth.js';
+  getSellerProducts,
+  addAdvancedSellerDetails,
+  addProduct,
+  listAllProducts,
+} from "../controller/sellerController.js";
+import { isSeller } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// ✅ One single multer instance for everything
+// Use memory storage for file uploads (RAM)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Seller docs upload (advanced details)
+// Advanced seller details upload (docs)
 const sellerDocsUpload = upload.fields([
-  { name: 'shopImages', maxCount: 5 },
-  { name: 'brandAssociations', maxCount: 5 },
-  { name: 'purchaseBills', maxCount: 5 }
+  { name: "shopImages", maxCount: 5 },
+  { name: "brandAssociations", maxCount: 5 },
+  { name: "purchaseBills", maxCount: 5 },
 ]);
 
-// 🔁 Routes
-router.post('/register', registerSeller);
-router.post('/login', loginSeller);
-router.get('/profile', isSeller, getSellerProfile);
-router.put('/details', isSeller, sellerDocsUpload, addAdvancedSellerDetails);
+// Product image upload (up to 4 images)
+const productImagesUpload = upload.fields([
+  { name: "image1", maxCount: 1 },
+  { name: "image2", maxCount: 1 },
+  { name: "image3", maxCount: 1 },
+  { name: "image4", maxCount: 1 },
+]);
 
-router.use((req, res, next) => {
-  console.log('🧪 Incoming content-type:', req.headers['content-type']);
-  next();
-});
+// Authenticated seller routes
+router.post("/register", registerSeller);
+router.post("/login", loginSeller);
+router.get("/profile", isSeller, getSellerProfile);
+router.put("/details", isSeller, sellerDocsUpload, addAdvancedSellerDetails);
+router.post("/product/add", isSeller, productImagesUpload, addProduct);
+router.get("/products", isSeller, getSellerProducts);
 
-
-// ✅ Catalogue upload
-router.post(
-  '/catalogue',
-  isSeller,
-  upload.fields([{ name: 'images', maxCount: 50 }]),
-  createCatalogue
-);
-
-router.get('/catalogue', isSeller, getCatalogues);
+// Public product listing route
+router.get("/product/public", listAllProducts);
 
 export default router;
