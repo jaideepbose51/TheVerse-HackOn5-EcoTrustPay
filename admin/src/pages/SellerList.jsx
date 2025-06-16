@@ -1,96 +1,52 @@
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-const dummySellers = [
-  {
-    _id: "S1",
-    name: "Green Earth Co.",
-    email: "green@earth.com",
-    status: "approved",
-    joinedAt: "2025-05-20",
-  },
-  {
-    _id: "S2",
-    name: "EcoDaily",
-    email: "eco@daily.com",
-    status: "blocked",
-    joinedAt: "2025-04-15",
-  },
-  {
-    _id: "S3",
-    name: "NatureFlex",
-    email: "support@natureflex.com",
-    status: "approved",
-    joinedAt: "2025-06-01",
-  },
-  {
-    _id: "S4",
-    name: "Bamboo Hive",
-    email: "bamboo@hive.com",
-    status: "approved",
-    joinedAt: "2025-03-27",
-  },
-  {
-    _id: "S5",
-    name: "GreenCart",
-    email: "hello@greencart.com",
-    status: "blocked",
-    joinedAt: "2025-02-10",
-  },
-  {
-    _id: "S6",
-    name: "EcoWave",
-    email: "contact@ecowave.in",
-    status: "approved",
-    joinedAt: "2025-05-30",
-  },
-  {
-    _id: "S7",
-    name: "ZeroWaste Store",
-    email: "info@zerowaste.com",
-    status: "approved",
-    joinedAt: "2025-04-01",
-  },
-  {
-    _id: "S8",
-    name: "Planet Essentials",
-    email: "hello@planetessentials.com",
-    status: "approved",
-    joinedAt: "2025-01-19",
-  },
-  {
-    _id: "S9",
-    name: "EarthKind",
-    email: "earth@kind.com",
-    status: "blocked",
-    joinedAt: "2025-03-09",
-  },
-  {
-    _id: "S10",
-    name: "SustainaShop",
-    email: "support@sustainashop.in",
-    status: "approved",
-    joinedAt: "2025-06-11",
-  },
-];
+const BASE_URL = "http://localhost:3000/api";
 
 const SellerList = () => {
   const [sellers, setSellers] = useState([]);
   const printRef = useRef();
 
-  useEffect(() => {
-    setSellers(dummySellers);
-  }, []);
+  // ✅ Fetch seller list from backend
+  const fetchSellers = async () => {
+    const token = localStorage.getItem("admin_token");
+    if (!token) return toast.error("Admin not logged in");
 
-  const toggleSellerStatus = (id) => {
-    const updated = sellers.map((s) =>
-      s._id === id
-        ? { ...s, status: s.status === "approved" ? "blocked" : "approved" }
-        : s
-    );
-    setSellers(updated);
+    try {
+      const res = await axios.get(`${BASE_URL}/admin/sellers`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Handle array or object format
+      const data = Array.isArray(res.data) ? res.data : res.data.sellers;
+
+      setSellers(data || []);
+      toast.success("Sellers loaded");
+    } catch (err) {
+      console.error("Fetch sellers error:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch sellers");
+    }
   };
 
+  // ✅ Toggle status locally (for UI only)
+  const toggleSellerStatus = (id) => {
+    setSellers((prev) =>
+      prev.map((s) =>
+        s._id === id
+          ? {
+              ...s,
+              status: s.status === "approved" ? "blocked" : "approved",
+            }
+          : s
+      )
+    );
+  };
+
+  // ✅ Optional print function
   const printSellerReport = () => {
     const html = printRef.current.innerHTML;
     const win = window.open("", "", "width=900,height=600");
@@ -100,6 +56,10 @@ const SellerList = () => {
     win.document.close();
     win.print();
   };
+
+  useEffect(() => {
+    fetchSellers();
+  }, []);
 
   return (
     <div className="p-4">
@@ -114,7 +74,7 @@ const SellerList = () => {
       </div>
 
       <div className="flex flex-col gap-2" ref={printRef}>
-        {/* Header */}
+        {/* Header Row */}
         <div className="hidden md:grid grid-cols-[2fr_2fr_1fr_1fr_1fr] items-center px-2 py-1 border bg-gray-100 text-sm font-semibold">
           <span>Name</span>
           <span>Email</span>
@@ -123,17 +83,17 @@ const SellerList = () => {
           <span>Action</span>
         </div>
 
-        {/* Seller rows */}
-        {sellers.map((seller, index) => (
+        {/* Seller Rows */}
+        {sellers.map((seller) => (
           <div
-            key={index}
+            key={seller._id}
             className="grid grid-cols-1 md:grid-cols-[2fr_2fr_1fr_1fr_1fr] items-center gap-2 py-3 px-2 border text-sm"
           >
             <Link
               to={`/admin/sellers/${seller._id}`}
               className="text-blue-600 hover:underline"
             >
-              {seller.name}
+              {seller.shopName || seller.name}
             </Link>
             <span>{seller.email}</span>
             <span
@@ -143,7 +103,11 @@ const SellerList = () => {
             >
               {seller.status}
             </span>
-            <span>{new Date(seller.joinedAt).toLocaleDateString()}</span>
+            <span>
+              {seller.createdAt
+                ? new Date(seller.createdAt).toLocaleDateString()
+                : "—"}
+            </span>
             <span className="text-right md:text-center">
               <button
                 className={`px-3 py-1 text-xs rounded text-white ${

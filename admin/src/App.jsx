@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SellerList from "./pages/SellerList";
 import SellerDetails from "./pages/SellerDetails";
+import PendingSellers from "./pages/PendingSellers";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export const currency = "₹";
@@ -38,7 +39,10 @@ const App = () => {
                 <Route path="/add" element={<Verify token={token} />} />
                 <Route path="/" element={<List token={token} />} />
                 <Route path="/sellers" element={<SellerList />} />
-                <Route path="/admin/sellers/:id" element={<SellerDetails />} />
+                <Route
+                  path="/admin/sellers/pending"
+                  element={<PendingSellers />}
+                />
               </Routes>
             </div>
           </div>

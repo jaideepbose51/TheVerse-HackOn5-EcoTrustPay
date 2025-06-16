@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-import Seller from '../model/sellerModel.js';
-import Catalogue from '../model/catalogueModel.js';
-import { Parser } from 'json2csv';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import Seller from "../model/sellerModel.js";
+import Catalogue from "../model/catalogueModel.js";
+import { Parser } from "json2csv";
 
 dotenv.config();
 
@@ -11,20 +11,28 @@ export const adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password)
-      return res.status(400).json({ success: false, message: "Missing credentials" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing credentials" });
 
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-      const token = jwt.sign({ email, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    if (
+      email === process.env.ADMIN_EMAIL &&
+      password === process.env.ADMIN_PASSWORD
+    ) {
+      const token = jwt.sign({ email, role: "admin" }, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
 
       return res.status(200).json({
         success: true,
         message: "Admin login successful",
-        token: `Bearer ${token}`
+        token,
       });
     }
 
-    return res.status(401).json({ success: false, message: "Invalid credentials" });
-
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid credentials" });
   } catch (error) {
     console.error("Admin login error:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -32,7 +40,7 @@ export const adminLogin = async (req, res) => {
 };
 
 export const getPendingSellers = async (req, res) => {
-  const sellers = await Seller.find({ status: 'pending' });
+  const sellers = await Seller.find({ status: "pending" });
   res.json(sellers);
 };
 
@@ -42,9 +50,11 @@ export const verifySeller = async (req, res) => {
 
     const seller = await Seller.findById(sellerId);
     if (!seller)
-      return res.status(404).json({ success: false, message: "Seller not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Seller not found" });
 
-    seller.status = 'verified';
+    seller.status = "verified";
     await seller.save();
 
     res.json({ success: true, message: "Seller verified", seller });
@@ -55,13 +65,15 @@ export const verifySeller = async (req, res) => {
 };
 
 export const getAllSellers = async (req, res) => {
-  const sellers = await Seller.find().select('-password');
+  const sellers = await Seller.find().select("-password");
   res.json(sellers);
 };
 
 export const getAllCatalogues = async (req, res) => {
-  const catalogues = await Catalogue.find()
-    .populate('seller', 'shopName email status sellerType');
+  const catalogues = await Catalogue.find().populate(
+    "seller",
+    "shopName email status sellerType"
+  );
   res.json(catalogues);
 };
 
@@ -70,9 +82,12 @@ export const blockSeller = async (req, res) => {
     const { sellerId } = req.params;
     const seller = await Seller.findById(sellerId);
 
-    if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
+    if (!seller)
+      return res
+        .status(404)
+        .json({ success: false, message: "Seller not found" });
 
-    seller.status = 'blocked';
+    seller.status = "blocked";
     await seller.save();
 
     res.json({ success: true, message: "Seller blocked successfully", seller });
@@ -87,12 +102,19 @@ export const unblockSeller = async (req, res) => {
     const { sellerId } = req.params;
     const seller = await Seller.findById(sellerId);
 
-    if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
+    if (!seller)
+      return res
+        .status(404)
+        .json({ success: false, message: "Seller not found" });
 
-    seller.status = 'verified';
+    seller.status = "verified";
     await seller.save();
 
-    res.json({ success: true, message: "Seller unblocked successfully", seller });
+    res.json({
+      success: true,
+      message: "Seller unblocked successfully",
+      seller,
+    });
   } catch (err) {
     console.error("Unblock Seller Error:", err);
     res.status(500).json({ success: false, message: "Server error" });
@@ -102,7 +124,7 @@ export const unblockSeller = async (req, res) => {
 // Export Sellers to CSV
 export const exportSellersCSV = async (req, res) => {
   try {
-    const sellers = await Seller.find().select('-password');
+    const sellers = await Seller.find().select("-password");
     const parser = new Parser();
     const csv = parser.parse(sellers);
 
@@ -111,23 +133,27 @@ export const exportSellersCSV = async (req, res) => {
     return res.send(csv);
   } catch (error) {
     console.error("CSV export error:", error);
-    res.status(500).json({ success: false, message: "Failed to export sellers report" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to export sellers report" });
   }
 };
 
 // Export Catalogues to CSV
 export const exportCataloguesCSV = async (req, res) => {
   try {
-    const catalogues = await Catalogue.find()
-      .populate('seller', 'shopName email sellerType status');
+    const catalogues = await Catalogue.find().populate(
+      "seller",
+      "shopName email sellerType status"
+    );
 
-    const flatData = catalogues.map(cat => ({
+    const flatData = catalogues.map((cat) => ({
       catalogueId: cat._id,
-      sellerName: cat.seller?.shopName || '',
-      sellerEmail: cat.seller?.email || '',
-      status: cat.seller?.status || '',
-      sellerType: cat.seller?.sellerType || '',
-      totalProducts: cat.products.length
+      sellerName: cat.seller?.shopName || "",
+      sellerEmail: cat.seller?.email || "",
+      status: cat.seller?.status || "",
+      sellerType: cat.seller?.sellerType || "",
+      totalProducts: cat.products.length,
     }));
 
     const parser = new Parser();
@@ -138,6 +164,8 @@ export const exportCataloguesCSV = async (req, res) => {
     return res.send(csv);
   } catch (error) {
     console.error("CSV export error:", error);
-    res.status(500).json({ success: false, message: "Failed to export catalogues report" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to export catalogues report" });
   }
 };
