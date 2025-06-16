@@ -6,12 +6,147 @@ import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 dotenv.config();
 import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Helper function to fetch image as base64
+const fetchImageAsBase64 = async (imageUrl) => {
+  try {
+    const response = await fetch(imageUrl);
+    const buffer = await response.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    return `data:image/jpeg;base64,${base64}`;
+  } catch (error) {
+    console.error("Error fetching image:", error);
+    throw new Error("Failed to process product image");
+  }
+};
+
+// ------------------- Eco Verification -------------------
+export const verifyEcoClaim = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const seller = await Seller.findById(req.user.id);
+    if (!seller) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Seller not found" });
+    }
+
+    const product = seller.products.id(id);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    if (!product.images || product.images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Product must have at least one image for verification",
+      });
+    }
+
+    // Get the first product image
+    const imageUrl = product.images[0];
+    const imageBase64 = await fetchImageAsBase64(imageUrl);
+
+    // Initialize the model
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // Prepare the prompt
+    const prompt = `
+      Analyze this product image and determine if the product appears to be eco-friendly based on:
+      1. Materials used (recycled, organic, sustainable)
+      2. Packaging (minimal, biodegradable, recyclable)
+      3. Any visible eco-labels or certifications
+      4. Overall environmental impact impression
+
+      Respond in this exact JSON format only:
+      {
+        "isEcoFriendly": boolean,
+        "confidence": number (0-1),
+        "reason": string (brief explanation),
+        "potentialLabels": array of strings (suggested eco-labels if applicable)
+      }
+    `;
+
+    // Generate content
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: imageBase64.split(",")[1], // Remove the data URL prefix
+        },
+      },
+    ]);
+
+    const response = await result.response;
+    let text = response.text();
+
+    // Clean the response text to ensure valid JSON
+    text = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    let ecoAssessment;
+    try {
+      ecoAssessment = JSON.parse(text);
+    } catch (err) {
+      console.error("Failed to parse AI response:", text);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to parse AI assessment",
+        rawResponse: text,
+      });
+    }
+
+    // Validate the response structure
+    if (
+      typeof ecoAssessment.isEcoFriendly !== "boolean" ||
+      typeof ecoAssessment.confidence !== "number" ||
+      typeof ecoAssessment.reason !== "string"
+    ) {
+      throw new Error("Invalid AI response format");
+    }
+
+    // Update the product
+    product.ecoVerified = ecoAssessment.isEcoFriendly;
+    product.ecoClaim = {
+      source: "AI",
+      label: ecoAssessment.potentialLabels?.[0] || "Eco-friendly",
+      confidence: ecoAssessment.confidence,
+      verifiedAt: new Date(),
+    };
+
+    await seller.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Eco verification completed",
+      isEcoFriendly: ecoAssessment.isEcoFriendly,
+      reason: ecoAssessment.reason,
+      confidence: ecoAssessment.confidence,
+    });
+  } catch (err) {
+    console.error("Eco verification error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Eco verification failed",
+      error: err.message,
+    });
+  }
+};
 
 // ------------------- Registration -------------------
 const sellerRegisterSchema = z.object({
@@ -115,7 +250,6 @@ export const addAdvancedSellerDetails = async (req, res) => {
     const uploadGroup = async (groupName) => {
       const files = req.files?.[groupName] || [];
       if (!files.length) throw new Error(`No files uploaded for ${groupName}`);
-
       const urls = [];
       for (let i = 0; i < files.length; i++) {
         for (let attempt = 1; attempt <= 3; attempt++) {
@@ -189,7 +323,10 @@ const productSchema = z.object({
 
 export const addProduct = async (req, res) => {
   try {
-    const validated = productSchema.parse(req.body);
+    const baseValidated = productSchema.parse(req.body);
+    const ecoClaim = req.body.ecoClaim ? JSON.parse(req.body.ecoClaim) : null;
+    const ecoVerified =
+      req.body.ecoVerified === "true" || req.body.ecoVerified === true;
 
     const imagesFiles = [
       ...(req.files?.image1 || []),
@@ -199,12 +336,10 @@ export const addProduct = async (req, res) => {
     ].filter(Boolean);
 
     if (imagesFiles.length === 0)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "At least one product image is required",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "At least one product image is required",
+      });
 
     if (imagesFiles.length > 4)
       return res
@@ -233,11 +368,23 @@ export const addProduct = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Seller not found" });
 
-    seller.products.push({
-      ...validated,
+    const newProduct = {
+      ...baseValidated,
       images: imageUrls,
+      ecoVerified,
       createdAt: new Date(),
-    });
+    };
+
+    if (ecoClaim) {
+      newProduct.ecoClaim = {
+        source: ecoClaim.source,
+        label: ecoClaim.label,
+        confidence: ecoClaim.confidence,
+        verifiedAt: ecoClaim.verifiedAt || new Date(),
+      };
+    }
+
+    seller.products.push(newProduct);
     await seller.save();
 
     res.status(201).json({

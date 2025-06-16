@@ -17,13 +17,16 @@ const Add = ({ token }) => {
   const [subCategory, setSubCategory] = useState("Topwear");
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
+  const [ecoClaim, setEcoClaim] = useState(false);
+
+  const [newProductId, setNewProductId] = useState(null);
+  const [verifying, setVerifying] = useState(false);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     try {
       const formData = new FormData();
-
       formData.append("name", name);
       formData.append("description", description);
       formData.append("price", price);
@@ -31,6 +34,7 @@ const Add = ({ token }) => {
       formData.append("subCategory", subCategory);
       formData.append("sizes", JSON.stringify(sizes));
       formData.append("bestseller", bestseller);
+      formData.append("ecoClaim", ecoClaim);
 
       if (image1) formData.append("image1", image1);
       if (image2) formData.append("image2", image2);
@@ -38,7 +42,6 @@ const Add = ({ token }) => {
       if (image4) formData.append("image4", image4);
 
       const authToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
-
       const response = await axios.post(
         `${backendUrl}/api/seller/product/add`,
         formData,
@@ -52,7 +55,9 @@ const Add = ({ token }) => {
 
       if (response.data.success) {
         toast.success(response.data.message);
-        // Reset all form fields
+        setNewProductId(response.data.productId || response.data._id);
+
+        // Reset form fields (but keep ecoClaim active if they want to verify)
         setName("");
         setDescription("");
         setPrice("");
@@ -75,6 +80,36 @@ const Add = ({ token }) => {
     }
   };
 
+  const handleEcoVerify = async () => {
+    if (!newProductId) {
+      toast.warning("Add product first before verifying");
+      return;
+    }
+
+    try {
+      setVerifying(true);
+      const authToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+      const response = await axios.post(
+        `${backendUrl}/api/seller/product/verify-eco/${newProductId}`,
+        {},
+        {
+          headers: { Authorization: authToken },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Product successfully eco-verified!");
+      } else {
+        toast.error(response.data.message || "Eco verification failed.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Verification error");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   return (
     <form
       onSubmit={onSubmitHandler}
@@ -82,7 +117,6 @@ const Add = ({ token }) => {
     >
       <div>
         <p className="mb-2">Upload Image</p>
-
         <div className="flex gap-2">
           {[image1, image2, image3, image4].map((img, idx) => {
             const setImage = [setImage1, setImage2, setImage3, setImage4][idx];
@@ -107,6 +141,7 @@ const Add = ({ token }) => {
         </div>
       </div>
 
+      {/* Product Inputs */}
       <div className="w-full">
         <p className="mb-2">Product Name</p>
         <input
@@ -209,9 +244,33 @@ const Add = ({ token }) => {
         </label>
       </div>
 
+      {/* Eco Claim */}
+      <div className="flex gap-2 mt-2">
+        <input
+          onChange={(e) => setEcoClaim(e.target.checked)}
+          type="checkbox"
+          id="ecoClaim"
+          checked={ecoClaim}
+        />
+        <label className="cursor-pointer" htmlFor="ecoClaim">
+          Claim Eco-Friendliness
+        </label>
+      </div>
+
       <button className="w-28 py-3 mt-4 bg-black text-white" type="submit">
         ADD
       </button>
+
+      {ecoClaim && newProductId && (
+        <button
+          type="button"
+          className="w-44 mt-3 py-2 bg-green-600 text-white"
+          onClick={handleEcoVerify}
+          disabled={verifying}
+        >
+          {verifying ? "Verifying..." : "Verify Eco Claim"}
+        </button>
+      )}
     </form>
   );
 };

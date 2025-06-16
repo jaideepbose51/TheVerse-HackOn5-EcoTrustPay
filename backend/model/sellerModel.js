@@ -27,7 +27,16 @@ const brandDocumentsSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// ✅ Embed product schema inside seller
+const ecoClaimSchema = new mongoose.Schema(
+  {
+    source: String, // "AI", "Manual"
+    label: String, // e.g., "Recyclable", "Organic"
+    confidence: Number, // 0–1 float
+    verifiedAt: Date,
+  },
+  { _id: false }
+);
+
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -39,8 +48,11 @@ const productSchema = new mongoose.Schema(
     bestseller: { type: Boolean, default: false },
     images: [String],
     createdAt: { type: Date, default: Date.now },
+
+    ecoVerified: { type: Boolean, default: false },
+    ecoClaim: { type: ecoClaimSchema, default: {} },
   },
-  { _id: true } // allow subdocuments to have their own _id
+  { _id: true }
 );
 
 const sellerSchema = new mongoose.Schema(
@@ -71,7 +83,6 @@ const sellerSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    // ✅ Embed products here
     products: [productSchema],
   },
   { timestamps: true }
