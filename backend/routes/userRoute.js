@@ -1,5 +1,5 @@
 import express from "express";
-import validateObjectIds from "../middleware/validateObjectIds.js"; // Changed to default import
+import validateObjectIds from "../middleware/validateObjectIds.js";
 import {
   registerUser,
   loginUser,
@@ -11,6 +11,8 @@ import {
   getCart,
   getAllProducts,
   getLatestProducts,
+  getNearbyOrders,
+  getUserEcoStats,
 } from "../controller/userController.js";
 import authUser from "../middleware/authUser.js";
 
@@ -23,11 +25,11 @@ userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/profile", authUser, getUserProfile);
 
-// 🛒 Cart routes - Updated to use the middleware
+// 🛒 Cart routes
 userRouter.post(
   "/cart/add",
   authUser,
-  validateObjectIds(["productId", "catalogueId"]), // Now using default import
+  validateObjectIds(["productId", "catalogueId"]),
   addToCart
 );
 
@@ -38,5 +40,9 @@ userRouter.post("/cart/remove", authUser, removeFromCart);
 userRouter.post("/order", authUser, placeOrder);
 userRouter.get("/orders", authUser, getOrders);
 userRouter.get("/products/latest", getLatestProducts);
+
+// 🌱 Eco features
+userRouter.get("/orders/nearby", authUser, getNearbyOrders);
+userRouter.get("/eco-stats", authUser, getUserEcoStats);
 
 export default userRouter;

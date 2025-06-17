@@ -217,6 +217,41 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  // Add this to your ShopContext.jsx
+  const refreshToken = async () => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/user/refresh-token`,
+        {
+          token: localStorage.getItem("refreshToken"), // Assuming you store this
+        }
+      );
+
+      if (response.data.token) {
+        setToken(response.data.token);
+        return response.data.token;
+      }
+    } catch (error) {
+      handleLogout();
+      throw error;
+    }
+  };
+
+  // Then modify your API calls to handle token refresh:
+  const apiCallWithRefresh = async (apiCall) => {
+    try {
+      return await apiCall();
+    } catch (error) {
+      if (error.response?.status === 401) {
+        // Try to refresh token
+        const newToken = await refreshToken();
+        // Retry with new token
+        return await apiCall(newToken);
+      }
+      throw error;
+    }
+  };
+
   const getCartAmount = () => {
     return Object.entries(cartItems).reduce((total, [productId, sizes]) => {
       const product = products.find(

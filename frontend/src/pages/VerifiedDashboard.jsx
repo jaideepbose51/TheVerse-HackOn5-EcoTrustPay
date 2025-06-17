@@ -1,69 +1,70 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { ShopContext } from "../context/ShopContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const VerifiedDashboard = () => {
-  const [orders, setOrders] = useState([]);
-  const [productCO2, setProductCO2] = useState(0);
-  const [groupCO2, setGroupCO2] = useState(0);
-  const [ecoPoints, setEcoPoints] = useState(0);
+  const { backendUrl, token } = useContext(ShopContext);
+  const [stats, setStats] = useState({
+    totalEcoPoints: 0,
+    totalCO2Saved: 0,
+    groupOrderCO2: 0,
+    orders: [],
+    rewardTier: "New Eco User",
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulated backend response
-    const fetchedOrders = [
-      {
-        id: "ORD123",
-        product: "Eco Bamboo Toothbrush",
-        status: "verified",
-        date: "2025-06-10",
-        co2Saved: 0.4,
-        grouped: true,
-        groupCO2Saved: 0.6,
-      },
-      {
-        id: "ORD124",
-        product: "Reusable Grocery Bag",
-        status: "verified",
-        date: "2025-06-12",
-        co2Saved: 0.6,
-        grouped: false,
-        groupCO2Saved: 0,
-      },
-      {
-        id: "ORD125",
-        product: "Green Cleaner Spray",
-        status: "flagged",
-        date: "2025-06-14",
-        co2Saved: 0,
-        grouped: false,
-        groupCO2Saved: 0,
-      },
-    ];
+    const fetchEcoStats = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/user/eco-stats`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-    setOrders(fetchedOrders);
+        if (response.data) {
+          setStats({
+            totalEcoPoints: response.data.totalEcoPoints,
+            totalCO2Saved: response.data.totalCO2Saved,
+            groupOrderCO2: response.data.groupOrderCO2,
+            orders: response.data.orders,
+            rewardTier: response.data.rewardTier,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching eco stats:", error);
+        toast.error("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Calculate total savings
-    const co2FromProducts = fetchedOrders
-      .filter((o) => o.status === "verified")
-      .reduce((sum, o) => sum + o.co2Saved, 0);
+    if (token) {
+      fetchEcoStats();
+    }
+  }, [token, backendUrl]);
 
-    const co2FromGroup = fetchedOrders
-      .filter((o) => o.status === "verified" && o.grouped)
-      .reduce((sum, o) => sum + o.groupCO2Saved, 0);
+  if (loading) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto text-center">
+        Loading your eco dashboard...
+      </div>
+    );
+  }
 
-    const totalPoints = Math.floor((co2FromProducts + co2FromGroup) * 10);
-
-    setProductCO2(co2FromProducts.toFixed(2));
-    setGroupCO2(co2FromGroup.toFixed(2));
-    setEcoPoints(totalPoints);
-  }, []);
-
-  const rewardTier =
-    ecoPoints >= 200
-      ? "🌟 Eco Champion - Free Gift!"
-      : ecoPoints >= 100
-      ? "🥈 Eco Saver - ₹150 off"
-      : ecoPoints >= 50
-      ? "🥉 Eco Starter - ₹50 off"
-      : "Keep going — rewards await!";
+  const rewardTierMessage = () => {
+    switch (stats.rewardTier) {
+      case "Eco Champion":
+        return "🌟 Eco Champion - Free Gift on Your Next Order!";
+      case "Eco Saver":
+        return "🥈 Eco Saver - ₹150 Off Your Next Purchase";
+      case "Eco Starter":
+        return "🥉 Eco Starter - ₹50 Off Your Next Purchase";
+      default:
+        return "Keep going — rewards await!";
+    }
+  };
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -71,18 +72,20 @@ const VerifiedDashboard = () => {
 
       <div className="grid gap-4 sm:grid-cols-3 mb-6">
         <div className="bg-green-100 p-4 rounded border-l-4 border-green-500 text-green-800">
-          🌿 <strong>{productCO2} kg</strong> CO₂ saved via eco products
+          🌿 <strong>{stats.totalCO2Saved.toFixed(2)} kg</strong> CO₂ saved via
+          eco products
         </div>
         <div className="bg-blue-100 p-4 rounded border-l-4 border-blue-500 text-blue-800">
-          🚚 <strong>{groupCO2} kg</strong> CO₂ saved via group orders
+          🚚 <strong>{stats.groupOrderCO2.toFixed(2)} kg</strong> CO₂ saved via
+          group orders
         </div>
         <div className="bg-yellow-100 p-4 rounded border-l-4 border-yellow-500 text-yellow-800">
-          🪙 <strong>{ecoPoints}</strong> EcoPoints earned
+          🪙 <strong>{stats.totalEcoPoints}</strong> EcoPoints earned
         </div>
       </div>
 
       <div className="mb-6 p-4 border rounded bg-gray-50 text-center text-gray-800 font-medium">
-        🎁 <span className="text-lg">{rewardTier}</span>
+        🎁 <span className="text-lg">{rewardTierMessage()}</span>
       </div>
 
       <div className="overflow-x-auto">
@@ -90,34 +93,52 @@ const VerifiedDashboard = () => {
           <thead>
             <tr className="bg-gray-100 text-left">
               <th className="p-3">Order ID</th>
-              <th className="p-3">Product</th>
               <th className="p-3">Date</th>
               <th className="p-3">Status</th>
+              <th className="p-3">Points</th>
               <th className="p-3">CO₂ (Product)</th>
               <th className="p-3">Group Order</th>
               <th className="p-3">CO₂ (Group)</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((o) => (
-              <tr key={o.id} className="border-b">
-                <td className="p-3">{o.id}</td>
-                <td className="p-3">{o.product}</td>
-                <td className="p-3">{o.date}</td>
+            {stats.orders.map((order) => (
+              <tr key={order.id} className="border-b">
+                <td className="p-3">{order.id.toString().slice(-6)}</td>
+                <td className="p-3">
+                  {new Date(order.date).toLocaleDateString()}
+                </td>
                 <td
                   className={`p-3 font-semibold ${
-                    o.status === "verified" ? "text-green-600" : "text-red-500"
+                    order.status === "paid" || order.status === "delivered"
+                      ? "text-green-600"
+                      : "text-red-500"
                   }`}
                 >
-                  {o.status === "verified" ? "Verified" : "Flagged"}
+                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </td>
-                <td className="p-3">{o.co2Saved}</td>
-                <td className="p-3">{o.grouped ? "Yes" : "No"}</td>
-                <td className="p-3">{o.groupCO2Saved}</td>
+                <td className="p-3">{order.points}</td>
+                <td className="p-3">{order.co2Product.toFixed(2)} kg</td>
+                <td className="p-3">{order.isGroupOrder ? "✅" : "❌"}</td>
+                <td className="p-3">
+                  {order.isGroupOrder ? "0.50 kg" : "0.00 kg"}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-8 bg-green-50 p-4 rounded-lg border border-green-200">
+        <h3 className="text-lg font-semibold mb-2 text-green-800">
+          How to Earn More EcoPoints
+        </h3>
+        <ul className="list-disc pl-5 space-y-1 text-green-700">
+          <li>Purchase verified eco-products (+1 point per ₹10 spent)</li>
+          <li>Join group orders (+50 bonus points)</li>
+          <li>Refer friends (+100 points per referral)</li>
+          <li>Complete your profile (+20 points)</li>
+        </ul>
       </div>
     </div>
   );

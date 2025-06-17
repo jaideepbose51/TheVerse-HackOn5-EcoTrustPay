@@ -2,8 +2,8 @@ import User from "../model/userModel.js";
 import Catalogue from "../model/catalogueModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import { z } from "zod";
+import mongoose from "mongoose";
 
 // 🔐 Zod validation schemas
 const passwordSchema = z
@@ -85,40 +85,7 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-const getUserCart = async (authToken) => {
-  try {
-    const res = await axios.get(`${backendUrl}/api/user/cart/get`, {
-      headers: {
-        Authorization: authToken,
-        "Content-Type": "application/json",
-      },
-      timeout: 5000, // Add timeout
-    });
-
-    if (res.data?.success) {
-      setCartItems(res.data.cartData || {});
-    } else {
-      throw new Error(res.data?.message || "Invalid cart data format");
-    }
-  } catch (err) {
-    console.error("Get cart error:", err);
-
-    // Handle specific error cases
-    if (err.response?.status === 401) {
-      toast.error("Session expired. Please login again");
-      setToken("");
-      localStorage.removeItem("token");
-    } else if (err.response?.status === 404) {
-      setCartItems({}); // Empty cart if not found
-    } else {
-      toast.error("Failed to load cart. Please refresh the page");
-    }
-
-    // Fallback to empty cart
-    setCartItems({});
-  }
-};
-
+// ✅ Get Cart
 export const getCart = async (req, res) => {
   try {
     if (!req.user?.id) {
@@ -157,6 +124,7 @@ export const getCart = async (req, res) => {
   }
 };
 
+// ✅ Add to Cart
 export const addToCart = async (req, res) => {
   try {
     const {
@@ -286,6 +254,7 @@ export const addToCart = async (req, res) => {
   }
 };
 
+// ✅ Remove from Cart
 export const removeFromCart = async (req, res) => {
   try {
     const { productId, catalogueId } = req.body;
@@ -311,18 +280,35 @@ export const removeFromCart = async (req, res) => {
 // ✅ Place Order
 export const placeOrder = async (req, res) => {
   try {
+    const { isGroupOrder = false } = req.body;
     const user = await User.findById(req.user.id);
+
     if (!user.cart.length)
       return res.status(400).json({ message: "Cart is empty" });
 
     let total = 0;
+    let ecoPoints = 0;
+    let co2Saved = 0;
 
     for (const item of user.cart) {
       const catalogue = await Catalogue.findById(item.catalogueId);
       const product = catalogue?.products.id(item.productId);
       if (!product)
         return res.status(404).json({ message: "Product not found" });
+
       total += product.price * item.quantity;
+
+      // Calculate eco points and CO2 savings for eco-verified products
+      if (product.ecoVerified) {
+        ecoPoints += Math.round(product.price * 0.1); // 1 point per ₹10 spent
+        co2Saved += product.co2Savings * item.quantity || 0;
+      }
+    }
+
+    // Add bonus for group orders
+    if (isGroupOrder) {
+      ecoPoints += 50;
+      co2Saved += 0.5; // Additional 0.5kg CO2 saved for group delivery
     }
 
     const order = {
@@ -330,16 +316,26 @@ export const placeOrder = async (req, res) => {
         productId: item.productId,
         catalogueId: item.catalogueId,
         quantity: item.quantity,
+        size: item.size,
       })),
       totalAmount: total,
       status: "paid",
+      ecoPoints,
+      co2Saved,
+      isGroupOrder,
+      createdAt: new Date(),
     };
 
     user.orders.push(order);
     user.cart = [];
     await user.save();
 
-    res.status(201).json({ message: "Order placed successfully", order });
+    res.status(201).json({
+      message: "Order placed successfully",
+      order,
+      ecoPoints,
+      co2Saved,
+    });
   } catch (err) {
     res.status(500).json({ message: "Order failed", error: err.message });
   }
@@ -357,11 +353,114 @@ export const getOrders = async (req, res) => {
   }
 };
 
+// ✅ Get Nearby Group Orders
+export const getNearbyOrders = async (req, res) => {
+  try {
+    // In a real app, we'd use geolocation or zipcode to find nearby orders
+    // For demo, we'll return a mock response for orders within the last 24 hours
+
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const nearbyOrders = await User.aggregate([
+      { $unwind: "$orders" },
+      {
+        $match: {
+          "orders.createdAt": { $gte: twentyFourHoursAgo },
+          "orders.isGroupOrder": false, // Only show individual orders that could be grouped
+        },
+      },
+      { $sample: { size: 3 } }, // Get 3 random orders for demo
+      {
+        $project: {
+          _id: 0,
+          orderId: "$orders._id",
+          products: "$orders.products",
+          createdAt: "$orders.createdAt",
+          zipCode: "$address.zipCode", // Assuming address has zipCode
+        },
+      },
+    ]);
+
+    if (nearbyOrders.length > 0) {
+      // Calculate potential savings if user joins this order
+      const potentialSavings = {
+        co2Savings: 0.5, // 0.5kg CO2 saved by combining deliveries
+        deliveryTimeReduction: 1, // 1 day faster delivery
+      };
+
+      res.json({
+        available: true,
+        details: {
+          orders: nearbyOrders,
+          potentialSavings,
+          zipCode: nearbyOrders[0].zipCode, // Show first order's zipcode
+        },
+      });
+    } else {
+      res.json({ available: false });
+    }
+  } catch (err) {
+    console.error("Error finding nearby orders:", err);
+    res.status(500).json({ message: "Error checking for group orders" });
+  }
+};
+
+// ✅ Get User Eco Stats
+export const getUserEcoStats = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const stats = {
+      totalEcoPoints: 0,
+      totalCO2Saved: 0,
+      groupOrderCO2: 0,
+      orders: [],
+    };
+
+    user.orders.forEach((order) => {
+      stats.totalEcoPoints += order.ecoPoints || 0;
+      stats.totalCO2Saved += order.co2Saved || 0;
+
+      if (order.isGroupOrder) {
+        stats.groupOrderCO2 += 0.5; // Additional savings for group orders
+      }
+
+      stats.orders.push({
+        id: order._id,
+        date: order.createdAt,
+        points: order.ecoPoints,
+        co2Product: order.co2Saved,
+        co2Group: order.isGroupOrder ? 0.5 : 0,
+        isGroupOrder: order.isGroupOrder,
+        status: order.status,
+      });
+    });
+
+    // Calculate reward tier
+    stats.rewardTier =
+      stats.totalEcoPoints >= 200
+        ? "Eco Champion"
+        : stats.totalEcoPoints >= 100
+        ? "Eco Saver"
+        : stats.totalEcoPoints >= 50
+        ? "Eco Starter"
+        : "New Eco User";
+
+    res.json(stats);
+  } catch (err) {
+    console.error("Error getting eco stats:", err);
+    res.status(500).json({ message: "Error fetching eco stats" });
+  }
+};
+
 // Updated getAllProducts function
 export const getAllProducts = async (req, res) => {
   try {
     const catalogues = await Catalogue.find().populate("seller", "name");
-    //Error
     const allProducts = [];
 
     catalogues.forEach((catalogue) => {
@@ -382,6 +481,8 @@ export const getAllProducts = async (req, res) => {
           catalogueId: catalogue._id,
           sellerId: catalogue.seller._id,
           sellerName: catalogue.seller.name,
+          ecoVerified: product.ecoVerified,
+          co2Savings: product.co2Savings || 0,
         });
       });
     });
