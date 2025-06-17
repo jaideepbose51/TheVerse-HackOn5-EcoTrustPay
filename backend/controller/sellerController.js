@@ -251,7 +251,6 @@ export const addAdvancedSellerDetails = async (req, res) => {
       });
     }
 
-    // Validate required fields
     if (!req.body.sellerType || !req.body.categories) {
       return res.status(400).json({
         success: false,
@@ -259,7 +258,7 @@ export const addAdvancedSellerDetails = async (req, res) => {
       });
     }
 
-    // Process files with better error handling
+    // Process files
     const processFiles = async (files) => {
       if (!files || files.length === 0) return [];
       const uploadResults = [];
@@ -283,20 +282,41 @@ export const addAdvancedSellerDetails = async (req, res) => {
       processFiles(req.files?.purchaseBills),
     ]);
 
-    // Update seller details
+    // Normalize and validate categories
+let categoriesRaw = req.body.categories;
+let categories = [];
+
+if (Array.isArray(categoriesRaw)) {
+  categories = categoriesRaw;
+} else if (typeof categoriesRaw === "string") {
+  try {
+    const parsed = JSON.parse(categoriesRaw);
+    categories = Array.isArray(parsed) ? parsed : [parsed];
+  } catch {
+    categories = [categoriesRaw]; // Fallback if not JSON
+  }
+}
+
+
+    const allowedCategories = ['fashion', 'electronics', 'grocery']; // ✅ Your enum list here
+    for (const category of categories) {
+      if (!allowedCategories.includes(category)) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid category: ${category}`,
+        });
+      }
+    }
+
     seller.sellerType = req.body.sellerType;
-    seller.categories = Array.isArray(req.body.categories)
-      ? req.body.categories
-      : [req.body.categories];
+    seller.categories = categories;
     seller.sellsBrands = req.body.sellsBrands === "true";
 
-    // Add documents based on seller type
     if (seller.sellerType === "branded") {
       if (!req.body.gstNumber || !req.body.sourceDetails) {
         return res.status(400).json({
           success: false,
-          message:
-            "GST number and source details are required for branded sellers",
+          message: "GST number and source details are required for branded sellers",
         });
       }
 
@@ -316,13 +336,11 @@ export const addAdvancedSellerDetails = async (req, res) => {
       };
     }
 
-    // Additional fields
     seller.businessAddress = req.body.businessAddress || "";
     seller.businessDescription = req.body.businessDescription || "";
     seller.yearsInBusiness = req.body.yearsInBusiness || 0;
     seller.website = req.body.website || "";
     seller.socialMediaLinks = req.body.socialMediaLinks || {};
-
     seller.status = "pending";
     seller.verificationSubmittedAt = new Date();
 
@@ -331,8 +349,7 @@ export const addAdvancedSellerDetails = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Verification submitted successfully",
-      nextSteps:
-        "Your documents are under review. You'll be notified via email.",
+      nextSteps: "Your documents are under review. You'll be notified via email.",
     });
   } catch (error) {
     console.error("Verification error:", error);
@@ -502,5 +519,28 @@ export const listAllProducts = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getSellerById = async (req, res) => {
+  try {
+    const seller = await Seller.findById(req.params.id).select("-password");
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Seller not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      seller,
+    });
+  } catch (error) {
+    console.error("Error fetching seller by ID:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };

@@ -9,6 +9,7 @@ import {
   addProduct,
   listAllProducts,
   verifyEcoClaim, // Add this import
+  getSellerById
 } from "../controller/sellerController.js";
 import { isSeller } from "../middleware/auth.js";
 
@@ -41,6 +42,8 @@ router.put("/details", isSeller, sellerDocsUpload, addAdvancedSellerDetails);
 router.post("/product/add", isSeller, productImagesUpload, addProduct);
 router.get("/products", isSeller, getSellerProducts);
 router.post("/product/verify-eco/:id", isSeller, verifyEcoClaim); // Add this route
+router.get("/profile/:id", getSellerById); // Public or protected, your choice
+
 
 // Public product listing route
 router.get("/product/public", listAllProducts);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const BASE_URL = "http://localhost:3000/api";
 
@@ -63,9 +64,7 @@ const PendingSellers = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">
-        Pending Sellers for Verification
-      </h2>
+      <h2 className="text-xl font-bold mb-4">Pending Sellers for Verification</h2>
 
       {pendingSellers.length === 0 ? (
         <p className="text-gray-500">No pending sellers found.</p>
@@ -74,9 +73,12 @@ const PendingSellers = () => {
           {pendingSellers.map((seller) => (
             <div
               key={seller._id}
-              className="border p-4 rounded shadow flex flex-col md:flex-row justify-between items-start md:items-center"
+              className="border p-4 rounded shadow flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-gray-100 transition"
             >
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <Link
+                to={`/admin/seller/${seller._id}`}
+                className="flex flex-col md:flex-row items-start md:items-center gap-4 flex-grow"
+              >
                 <img
                   src={
                     seller.profilePhoto ||
@@ -95,7 +97,8 @@ const PendingSellers = () => {
                     Joined: {new Date(seller.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-              </div>
+              </Link>
+
               <div className="flex gap-2 mt-4 md:mt-0">
                 <button
                   onClick={() => updateSellerStatus(seller._id, "approved")}
