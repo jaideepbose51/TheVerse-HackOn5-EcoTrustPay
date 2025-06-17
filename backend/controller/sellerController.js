@@ -240,67 +240,107 @@ export const getSellerProfile = async (req, res) => {
 };
 
 // ------------------- Advanced Details -------------------
+
 export const addAdvancedSellerDetails = async (req, res) => {
   try {
     const seller = await Seller.findById(req.user.id);
-    if (!seller) return res.status(404).json({ message: "Seller not found" });
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Seller not found",
+      });
+    }
 
-    const { sellerType, categories, sellsBrands, gstNumber, sourceDetails } =
-      req.body;
+    // Validate required fields
+    if (!req.body.sellerType || !req.body.categories) {
+      return res.status(400).json({
+        success: false,
+        message: "Seller type and categories are required",
+      });
+    }
 
-    const uploadGroup = async (groupName) => {
-      const files = req.files?.[groupName] || [];
-      if (!files.length) throw new Error(`No files uploaded for ${groupName}`);
-      const urls = [];
-      for (let i = 0; i < files.length; i++) {
-        for (let attempt = 1; attempt <= 3; attempt++) {
-          try {
-            const url = await uploadToCloudinary(
-              files[i].buffer,
-              "seller-docs"
-            );
-            urls.push(url);
-            break;
-          } catch (err) {
-            if (attempt === 3)
-              throw new Error(`Upload failed for ${groupName} file ${i + 1}`);
-          }
+    // Process files with better error handling
+    const processFiles = async (files) => {
+      if (!files || files.length === 0) return [];
+      const uploadResults = [];
+
+      for (const file of files) {
+        try {
+          const url = await uploadToCloudinary(file.buffer, "seller-docs");
+          uploadResults.push(url);
+        } catch (error) {
+          console.error("File upload error:", error);
+          throw new Error(`Failed to upload file: ${file.originalname}`);
         }
       }
-      return urls;
+
+      return uploadResults;
     };
 
     const [shopImages, brandAssociations, purchaseBills] = await Promise.all([
-      uploadGroup("shopImages"),
-      uploadGroup("brandAssociations"),
-      uploadGroup("purchaseBills"),
+      processFiles(req.files?.shopImages),
+      processFiles(req.files?.brandAssociations),
+      processFiles(req.files?.purchaseBills),
     ]);
 
-    seller.sellerType = sellerType;
-    seller.categories = Array.isArray(categories) ? categories : [categories];
-    seller.sellsBrands = sellsBrands === "true";
+    // Update seller details
+    seller.sellerType = req.body.sellerType;
+    seller.categories = Array.isArray(req.body.categories)
+      ? req.body.categories
+      : [req.body.categories];
+    seller.sellsBrands = req.body.sellsBrands === "true";
 
-    if (sellerType === "branded") {
+    // Add documents based on seller type
+    if (seller.sellerType === "branded") {
+      if (!req.body.gstNumber || !req.body.sourceDetails) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "GST number and source details are required for branded sellers",
+        });
+      }
+
       seller.brandDocuments = {
-        gstNumber,
-        sourceDetails,
+        gstNumber: req.body.gstNumber,
+        sourceDetails: req.body.sourceDetails,
         shopImages,
         brandAssociations,
         purchaseBills,
+        registrationDate: new Date(),
+      };
+    } else {
+      seller.unbrandedDocuments = {
+        shopImages,
+        purchaseBills,
+        registrationDate: new Date(),
       };
     }
 
+    // Additional fields
+    seller.businessAddress = req.body.businessAddress || "";
+    seller.businessDescription = req.body.businessDescription || "";
+    seller.yearsInBusiness = req.body.yearsInBusiness || 0;
+    seller.website = req.body.website || "";
+    seller.socialMediaLinks = req.body.socialMediaLinks || {};
+
     seller.status = "pending";
+    seller.verificationSubmittedAt = new Date();
+
     await seller.save();
 
     res.status(200).json({
-      message:
-        "Advanced seller details submitted successfully. Awaiting admin verification.",
+      success: true,
+      message: "Verification submitted successfully",
+      nextSteps:
+        "Your documents are under review. You'll be notified via email.",
     });
-  } catch (err) {
+  } catch (error) {
+    console.error("Verification error:", error);
     res.status(500).json({
-      message: "Failed to submit advanced seller details",
-      error: err.message,
+      success: false,
+      message: "Internal server error during verification",
+      error: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
   }
 };
@@ -363,8 +403,7 @@ export const addProduct = async (req, res) => {
           imageUrls.push(url);
           break;
         } catch (error) {
-          if (attempt === 3)
-            throw new Error(`Failed to upload image ${i + 1}`);
+          if (attempt === 3) throw new Error(`Failed to upload image ${i + 1}`);
         }
       }
     }
@@ -428,7 +467,6 @@ export const addProduct = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
-
 
 // ------------------- Get Own Seller's Products -------------------
 export const getSellerProducts = async (req, res) => {
