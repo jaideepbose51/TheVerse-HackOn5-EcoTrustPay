@@ -14,6 +14,7 @@ const PlaceOrder = () => {
   const [ecoPointsEarned, setEcoPointsEarned] = useState(0);
   const [co2Savings, setCo2Savings] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingGroupOrder, setIsCheckingGroupOrder] = useState(false);
 
   const {
     navigate,
@@ -26,7 +27,7 @@ const PlaceOrder = () => {
     products,
     handleLogout,
     getAuthHeaders,
-    getCatalogueIdForProduct, // Now properly destructured
+    getCatalogueIdForProduct,
   } = useContext(ShopContext);
 
   const [formData, setFormData] = useState({
@@ -70,37 +71,45 @@ const PlaceOrder = () => {
     calculateSavings();
   }, [cartItems, products, acceptGroupOrder]);
 
-  useEffect(() => {
-    const checkForGroupOrders = async () => {
-      if (!token || !formData.zipCode) return;
-
-      try {
-        const response = await axios.get(
-          `${backendUrl}/api/user/orders/nearby`,
-          {
-            ...getAuthHeaders(),
-            params: { zipCode: formData.zipCode },
-          }
-        );
-
-        if (response.data.available) {
-          setGroupOrderAvailable(true);
-          setGroupOrderDetails(response.data.details);
-          setShowGroupOrderModal(true);
-        }
-      } catch (error) {
-        console.error("Group order check error:", error);
-        if (error.response?.status === 401) {
-          toast.error("Session expired. Please login again");
-          handleLogout();
-        }
-      }
-    };
-
-    if (token && formData.zipCode) {
-      checkForGroupOrders();
+  const checkForGroupOrders = async () => {
+    if (!token) {
+      toast.error("Please login to check group delivery options");
+      return;
     }
-  }, [token, formData.zipCode]);
+
+    if (!formData.zipCode || formData.zipCode.length < 5) {
+      toast.error("Please enter a valid 5-digit ZIP code");
+      return;
+    }
+
+    try {
+      setIsCheckingGroupOrder(true);
+      const response = await axios.get(`${backendUrl}/api/user/orders/nearby`, {
+        ...getAuthHeaders(),
+        params: { zipCode: formData.zipCode },
+      });
+
+      if (response.data.available) {
+        setGroupOrderAvailable(true);
+        setGroupOrderDetails(response.data.details);
+        setShowGroupOrderModal(true);
+      } else {
+        toast.info("No group delivery options available in your area");
+        setGroupOrderAvailable(false);
+        setAcceptGroupOrder(false);
+      }
+    } catch (error) {
+      console.error("Group order check error:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again");
+        handleLogout();
+      } else {
+        toast.error("Failed to check group delivery options");
+      }
+    } finally {
+      setIsCheckingGroupOrder(false);
+    }
+  };
 
   const onChaneHandler = (e) => {
     const { name, value } = e.target;
@@ -322,19 +331,35 @@ const PlaceOrder = () => {
               onChange={onChaneHandler}
               name="state"
               value={formData.state}
-              className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+              className="border border-gray-300 rounded py-1.5 px-3.5 w-1/4"
               type="text"
               placeholder="State"
             />
-            <input
-              required
-              onChange={onChaneHandler}
-              name="zipCode"
-              value={formData.zipCode}
-              className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-              type="text"
-              placeholder="ZIP Code"
-            />
+            <div className="flex gap-2 w-3/4">
+              <input
+                required
+                onChange={onChaneHandler}
+                name="zipCode"
+                value={formData.zipCode}
+                className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                type="text"
+                placeholder="PIN Code"
+                minLength="6"
+                maxLength="6"
+              />
+              <button
+                type="button"
+                onClick={checkForGroupOrders}
+                className="bg-blue-500 text-white px-4 py-1.5 rounded whitespace-nowrap disabled:opacity-50"
+                disabled={
+                  !formData.zipCode ||
+                  formData.zipCode.length < 5 ||
+                  isCheckingGroupOrder
+                }
+              >
+                {isCheckingGroupOrder ? "Checking..." : "Check Group Delivery"}
+              </button>
+            </div>
           </div>
 
           <input
@@ -362,14 +387,43 @@ const PlaceOrder = () => {
           <div className="mt-8 min-w-80">
             <CartTotal />
 
-            {acceptGroupOrder && (
-              <div className="mt-4 bg-blue-50 p-3 rounded border border-blue-200">
-                <p className="text-blue-800 font-medium flex items-center">
-                  <span className="mr-2">👥</span>
-                  Joined Group Order - Delivery in 1 day
-                </p>
-              </div>
-            )}
+            <div className="mt-4">
+              {!acceptGroupOrder && (
+                <div className="bg-gray-50 p-3 rounded border border-gray-200">
+                  <p className="font-medium">Want to save more?</p>
+                  <button
+                    type="button"
+                    onClick={checkForGroupOrders}
+                    className="text-blue-600 underline mt-1"
+                    disabled={!formData.zipCode || formData.zipCode.length < 5}
+                  >
+                    Check for group delivery options
+                  </button>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Join with neighbors to reduce emissions and earn extra
+                    EcoPoints
+                  </p>
+                </div>
+              )}
+              {acceptGroupOrder && (
+                <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                  <p className="text-blue-800 font-medium flex items-center">
+                    <span className="mr-2">👥</span>
+                    Joined Group Order - Delivery in 1 day
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAcceptGroupOrder(false);
+                      toast.info("You've left the group order");
+                    }}
+                    className="text-blue-600 underline text-sm mt-1"
+                  >
+                    Leave group order
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="mt-12">
