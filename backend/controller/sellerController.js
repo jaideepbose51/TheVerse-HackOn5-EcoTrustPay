@@ -363,7 +363,8 @@ export const addProduct = async (req, res) => {
           imageUrls.push(url);
           break;
         } catch (error) {
-          if (attempt === 3) throw new Error(`Failed to upload image ${i + 1}`);
+          if (attempt === 3)
+            throw new Error(`Failed to upload image ${i + 1}`);
         }
       }
     }
@@ -373,6 +374,15 @@ export const addProduct = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Seller not found" });
+
+    // ✅ Verified check added here
+    if (seller.status !== "verified") {
+      console.warn("🔒 Seller is not verified yet");
+      return res.status(403).json({
+        success: false,
+        message: "Seller not verified by admin yet",
+      });
+    }
 
     const newProduct = {
       ...baseValidated,
@@ -418,6 +428,7 @@ export const addProduct = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 // ------------------- Get Own Seller's Products -------------------
 export const getSellerProducts = async (req, res) => {
