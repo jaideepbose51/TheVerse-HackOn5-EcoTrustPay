@@ -26,9 +26,18 @@ const Add = ({ token }) => {
     description: "",
   });
   const [isEcoFriendly, setIsEcoFriendly] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    // Validate required fields
+    if (!name || !description || !price || !image1) {
+      toast.error("Please fill all required fields");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -36,55 +45,57 @@ const Add = ({ token }) => {
       // Append basic product info
       formData.append("name", name);
       formData.append("description", description);
-      formData.append("price", price);
+      formData.append("price", parseFloat(price).toFixed(2));
       formData.append("category", category);
       formData.append("subCategory", subCategory);
-      formData.append("sizes", JSON.stringify(sizes));
       formData.append("bestseller", bestseller);
+
+      // Handle sizes
+      if (sizes.length > 0) {
+        formData.append("sizes", sizes.join(","));
+      } else {
+        formData.append("sizes", "One Size");
+      }
 
       // Append eco-friendly info if provided
       if (isEcoFriendly) {
-        formData.append(
-          "ecoClaim",
-          JSON.stringify({
-            label: ecoClaim.label,
-            description: ecoClaim.description,
-          })
-        );
-        formData.append("ecoVerified", false); // Start as unverified
+        formData.append("ecoLabel", ecoClaim.label);
+        formData.append("ecoDescription", ecoClaim.description);
+        formData.append("ecoVerified", "false");
       }
 
-      // Append images
+      // Append images with correct field names
       if (image1) formData.append("image1", image1);
       if (image2) formData.append("image2", image2);
       if (image3) formData.append("image3", image3);
       if (image4) formData.append("image4", image4);
-
-      const authToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
 
       const response = await axios.post(
         `${backendUrl}/api/seller/product/add`,
         formData,
         {
           headers: {
-            Authorization: authToken,
+            Authorization: `Bearer ${token.replace("Bearer ", "")}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
 
       if (response.data.success) {
-        toast.success(response.data.message);
-        // Reset all form fields
+        toast.success("Product added successfully!");
         resetForm();
       } else {
-        toast.error(response.data.message || "Failed to add product");
+        throw new Error(response.data.message || "Failed to add product");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Add product error:", error);
       toast.error(
-        error.response?.data?.message || error.message || "Something went wrong"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to add product. Please try again."
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,29 +126,31 @@ const Add = ({ token }) => {
   return (
     <form
       onSubmit={onSubmitHandler}
-      className="flex flex-col w-full items-start gap-3"
+      className="flex flex-col w-full items-start gap-3 p-4 max-w-4xl mx-auto"
     >
       {/* Image Upload Section */}
-      <div>
-        <p className="mb-2">Upload Image (At least 1 required)</p>
-        <div className="flex gap-2">
+      <div className="w-full">
+        <p className="mb-2 font-medium">Upload Images (At least 1 required)</p>
+        <div className="flex gap-4 flex-wrap">
           {[image1, image2, image3, image4].map((img, idx) => {
             const setImage = [setImage1, setImage2, setImage3, setImage4][idx];
             const id = `image${idx + 1}`;
             return (
-              <label key={id} htmlFor={id}>
-                <img
-                  className="w-20 h-20 object-cover border rounded"
-                  src={!img ? assets.upload_area : URL.createObjectURL(img)}
-                  alt="upload"
-                />
+              <label key={id} htmlFor={id} className="cursor-pointer">
+                <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={!img ? assets.upload_area : URL.createObjectURL(img)}
+                    alt="upload"
+                  />
+                </div>
                 <input
                   onChange={(e) => setImage(e.target.files[0])}
                   type="file"
                   id={id}
                   hidden
                   accept="image/*"
-                  required={idx === 0} // First image is required
+                  required={idx === 0}
                 />
               </label>
             );
@@ -147,37 +160,38 @@ const Add = ({ token }) => {
 
       {/* Product Basic Info */}
       <div className="w-full">
-        <p className="mb-2">Product Name</p>
+        <label className="block mb-2 font-medium">Product Name*</label>
         <input
           onChange={(e) => setName(e.target.value)}
           value={name}
-          className="w-full max-w-[500px] px-3 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           type="text"
-          placeholder="Type Here"
+          placeholder="Enter product name"
           required
         />
       </div>
 
       <div className="w-full">
-        <p className="mb-2">Product Description</p>
+        <label className="block mb-2 font-medium">Product Description*</label>
         <textarea
           onChange={(e) => setDescription(e.target.value)}
           value={description}
-          className="w-full max-w-[500px] px-3 py-2 border rounded"
-          placeholder="Write Content Here"
-          rows="3"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Describe your product in detail"
+          rows="4"
           required
         />
       </div>
 
       {/* Category and Price */}
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
-        <div className="w-full sm:w-1/3">
-          <p className="mb-2">Product Category</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+        <div>
+          <label className="block mb-2 font-medium">Category*</label>
           <select
             onChange={(e) => setCategory(e.target.value)}
             value={category}
-            className="w-full px-3 py-2 border rounded"
+            className="w-full px-4 py-2 border rounded-lg"
+            required
           >
             <option value="Men">Men</option>
             <option value="Women">Women</option>
@@ -188,12 +202,13 @@ const Add = ({ token }) => {
           </select>
         </div>
 
-        <div className="w-full sm:w-1/3">
-          <p className="mb-2">Sub Category</p>
+        <div>
+          <label className="block mb-2 font-medium">Sub Category*</label>
           <select
             onChange={(e) => setSubCategory(e.target.value)}
             value={subCategory}
-            className="w-full px-3 py-2 border rounded"
+            className="w-full px-4 py-2 border rounded-lg"
+            required
           >
             <option value="Topwear">Topwear</option>
             <option value="Bottomwear">Bottomwear</option>
@@ -203,14 +218,14 @@ const Add = ({ token }) => {
           </select>
         </div>
 
-        <div className="w-full sm:w-1/3">
-          <p className="mb-2">Product Price</p>
+        <div>
+          <label className="block mb-2 font-medium">Price (₹)*</label>
           <input
             onChange={(e) => setPrice(e.target.value)}
             value={price}
-            className="w-full px-3 py-2 border rounded"
+            className="w-full px-4 py-2 border rounded-lg"
             type="number"
-            placeholder="25"
+            placeholder="0.00"
             min="0"
             step="0.01"
             required
@@ -219,12 +234,13 @@ const Add = ({ token }) => {
       </div>
 
       {/* Sizes */}
-      <div>
-        <p className="mb-2">Product Sizes</p>
-        <div className="flex gap-3">
+      <div className="w-full">
+        <label className="block mb-2 font-medium">Available Sizes</label>
+        <div className="flex flex-wrap gap-2">
           {["S", "M", "L", "XL", "XXL", "One Size"].map((size) => (
-            <div
+            <button
               key={size}
+              type="button"
               onClick={() =>
                 setSizes((prev) =>
                   prev.includes(size)
@@ -232,29 +248,30 @@ const Add = ({ token }) => {
                     : [...prev, size]
                 )
               }
+              className={`px-4 py-2 rounded-full text-sm font-medium ${
+                sizes.includes(size)
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
             >
-              <p
-                className={`${
-                  sizes.includes(size) ? "bg-pink-100" : "bg-slate-200"
-                } px-3 py-1 cursor-pointer rounded`}
-              >
-                {size}
-              </p>
-            </div>
+              {size}
+            </button>
           ))}
         </div>
       </div>
 
       {/* Bestseller */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mt-2">
         <input
           type="checkbox"
           id="bestseller"
           checked={bestseller}
           onChange={(e) => setBestseller(e.target.checked)}
-          className="w-4 h-4"
+          className="w-5 h-5 rounded"
         />
-        <label htmlFor="bestseller">Mark as Bestseller</label>
+        <label htmlFor="bestseller" className="font-medium">
+          Mark as Bestseller
+        </label>
       </div>
 
       {/* Eco-Friendly Section */}
@@ -265,7 +282,7 @@ const Add = ({ token }) => {
             id="ecoFriendly"
             checked={isEcoFriendly}
             onChange={(e) => setIsEcoFriendly(e.target.checked)}
-            className="w-4 h-4"
+            className="w-5 h-5 rounded"
           />
           <label htmlFor="ecoFriendly" className="font-medium">
             This product is eco-friendly
@@ -273,43 +290,48 @@ const Add = ({ token }) => {
         </div>
 
         {isEcoFriendly && (
-          <div className="space-y-3 bg-green-50 p-4 rounded">
+          <div className="space-y-3 bg-green-50 p-4 rounded-lg">
             <div>
-              <p className="mb-2">Eco-Friendly Label</p>
+              <label className="block mb-2 font-medium">
+                Eco-Friendly Label
+              </label>
               <input
                 type="text"
                 name="label"
                 value={ecoClaim.label}
                 onChange={handleEcoClaimChange}
                 placeholder="e.g., Organic, Recycled, Sustainable"
-                className="w-full max-w-[500px] px-3 py-2 border rounded"
+                className="w-full px-4 py-2 border rounded-lg"
               />
             </div>
             <div>
-              <p className="mb-2">Eco-Friendly Description</p>
+              <label className="block mb-2 font-medium">
+                Eco-Friendly Description
+              </label>
               <textarea
                 name="description"
                 value={ecoClaim.description}
                 onChange={handleEcoClaimChange}
                 placeholder="Describe why this product is eco-friendly"
-                className="w-full max-w-[500px] px-3 py-2 border rounded"
-                rows="2"
+                className="w-full px-4 py-2 border rounded-lg"
+                rows="3"
               />
             </div>
-            <p className="text-sm text-gray-600">
-              Note: After submission, you can verify your eco claims through our
-              AI verification system.
-            </p>
           </div>
         )}
       </div>
 
       {/* Submit Button */}
       <button
-        className="w-28 py-3 mt-4 bg-black text-white rounded hover:bg-gray-800 transition"
+        className={`w-full md:w-48 py-3 mt-6 rounded-lg font-medium ${
+          isSubmitting
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-black text-white hover:bg-gray-800"
+        }`}
         type="submit"
+        disabled={isSubmitting}
       >
-        ADD
+        {isSubmitting ? "Adding Product..." : "Add Product"}
       </button>
     </form>
   );

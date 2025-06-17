@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Catalogue from "../model/catalogueModel.js";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -311,10 +312,15 @@ const productSchema = z.object({
   price: z.preprocess((val) => Number(val), z.number().positive()),
   category: z.string().min(2),
   subCategory: z.string().min(2).optional(),
-  sizes: z.preprocess(
-    (val) => (typeof val === "string" ? JSON.parse(val) : val),
-    z.array(z.string()).optional()
-  ),
+  sizes: z.preprocess((val) => {
+    if (Array.isArray(val)) return val;
+    if (val === "One Size") return ["One Size"];
+    try {
+      return typeof val === "string" ? JSON.parse(val) : val;
+    } catch {
+      return [val]; // Fallback to array with the value
+    }
+  }, z.array(z.string()).optional()),
   bestseller: z.preprocess(
     (val) => val === "true" || val === true,
     z.boolean().optional()
