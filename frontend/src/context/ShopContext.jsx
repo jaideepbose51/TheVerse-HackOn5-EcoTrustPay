@@ -318,6 +318,7 @@ const ShopContextProvider = (props) => {
     getProductData();
   }, []);
 
+  // In your ShopContext.jsx, ensure getAuthHeaders is included in the context value
   const contextValue = {
     products,
     productsLoading,
@@ -342,6 +343,13 @@ const ShopContextProvider = (props) => {
     getCatalogueIdForProduct,
     checkProductAvailability,
     handleLogout,
+    getAuthHeaders: () => ({
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      timeout: 10000,
+    }),
   };
 
   return (

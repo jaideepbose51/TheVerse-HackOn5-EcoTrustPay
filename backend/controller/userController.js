@@ -277,55 +277,88 @@ export const removeFromCart = async (req, res) => {
   }
 };
 
-// ✅ Place Order
 export const placeOrder = async (req, res) => {
   try {
-    const { isGroupOrder = false } = req.body;
+    const { isGroupOrder = false, address, products } = req.body;
     const user = await User.findById(req.user.id);
 
-    if (!user.cart.length)
-      return res.status(400).json({ message: "Cart is empty" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!products || products.length === 0) {
+      return res.status(400).json({ message: "No products in order" });
+    }
+
+    // Validate address structure
+    if (!address || !address.line1 || !address.city || !address.zipCode) {
+      return res.status(400).json({ message: "Invalid address format" });
+    }
 
     let total = 0;
     let ecoPoints = 0;
     let co2Saved = 0;
+    const orderProducts = [];
 
-    for (const item of user.cart) {
+    // Process each product
+    for (const item of products) {
       const catalogue = await Catalogue.findById(item.catalogueId);
-      const product = catalogue?.products.id(item.productId);
-      if (!product)
-        return res.status(404).json({ message: "Product not found" });
-
-      total += product.price * item.quantity;
-
-      // Calculate eco points and CO2 savings for eco-verified products
-      if (product.ecoVerified) {
-        ecoPoints += Math.round(product.price * 0.1); // 1 point per ₹10 spent
-        co2Saved += product.co2Savings * item.quantity || 0;
+      if (!catalogue) {
+        return res.status(404).json({
+          message: `Catalogue not found for product ${item.productId}`,
+        });
       }
-    }
 
-    // Add bonus for group orders
-    if (isGroupOrder) {
-      ecoPoints += 50;
-      co2Saved += 0.5; // Additional 0.5kg CO2 saved for group delivery
-    }
+      const product = catalogue.products.id(item.productId);
+      if (!product) {
+        return res.status(404).json({
+          message: `Product ${item.productId} not found in catalogue`,
+        });
+      }
 
-    const order = {
-      products: user.cart.map((item) => ({
+      // Validate stock
+      if (!product.inStock) {
+        return res.status(400).json({
+          message: `Product ${product.name} is out of stock`,
+        });
+      }
+
+      // Calculate values
+      const itemTotal = product.price * item.quantity;
+      total += itemTotal;
+
+      if (product.ecoVerified) {
+        ecoPoints += Math.round(itemTotal * 0.1); // 1 point per ₹10
+        co2Saved += (product.co2Savings || 0) * item.quantity;
+      }
+
+      orderProducts.push({
         productId: item.productId,
         catalogueId: item.catalogueId,
         quantity: item.quantity,
-        size: item.size,
-      })),
+        size: item.size || "one-size",
+      });
+    }
+
+    // Group order bonus
+    if (isGroupOrder) {
+      ecoPoints += 50;
+      co2Saved += 0.5;
+    }
+
+    // Create order
+    const order = {
+      products: orderProducts,
       totalAmount: total,
       status: "paid",
+      address, // Store validated address
       ecoPoints,
       co2Saved,
       isGroupOrder,
       createdAt: new Date(),
     };
 
+    // Save to user
     user.orders.push(order);
     user.cart = [];
     await user.save();
@@ -337,7 +370,11 @@ export const placeOrder = async (req, res) => {
       co2Saved,
     });
   } catch (err) {
-    res.status(500).json({ message: "Order failed", error: err.message });
+    console.error("Order processing error:", err);
+    res.status(500).json({
+      message: "Order processing failed",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
   }
 };
 

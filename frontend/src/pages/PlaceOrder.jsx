@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
-import { assets } from "../assets/assets";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -14,6 +13,7 @@ const PlaceOrder = () => {
   const [acceptGroupOrder, setAcceptGroupOrder] = useState(false);
   const [ecoPointsEarned, setEcoPointsEarned] = useState(0);
   const [co2Savings, setCo2Savings] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     navigate,
@@ -24,6 +24,9 @@ const PlaceOrder = () => {
     getCartAmount,
     delivery_fee,
     products,
+    handleLogout,
+    getAuthHeaders,
+    getCatalogueIdForProduct, // Now properly destructured
   } = useContext(ShopContext);
 
   const [formData, setFormData] = useState({
@@ -39,7 +42,6 @@ const PlaceOrder = () => {
   });
 
   useEffect(() => {
-    // Calculate eco points and CO2 savings whenever cart changes
     const calculateSavings = () => {
       let points = 0;
       let savings = 0;
@@ -56,7 +58,6 @@ const PlaceOrder = () => {
         }
       });
 
-      // Add bonus for group orders if accepted
       if (acceptGroupOrder) {
         points += 50;
         savings += 0.5;
@@ -77,10 +78,7 @@ const PlaceOrder = () => {
         const response = await axios.get(
           `${backendUrl}/api/user/orders/nearby`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
+            ...getAuthHeaders(),
             params: { zipCode: formData.zipCode },
           }
         );
@@ -91,14 +89,10 @@ const PlaceOrder = () => {
           setShowGroupOrderModal(true);
         }
       } catch (error) {
-        console.log("Group order check error:", {
-          status: error.response?.status,
-          message: error.message,
-        });
-
+        console.error("Group order check error:", error);
         if (error.response?.status === 401) {
           toast.error("Session expired. Please login again");
-          handleLogout(); // Assuming you have access to handleLogout from context
+          handleLogout();
         }
       }
     };
@@ -115,82 +109,94 @@ const PlaceOrder = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    if (!token) {
+      toast.error("Please login to place an order");
+      navigate("/login");
+      return;
+    }
+
     try {
-      let orderItems = [];
-      for (const items in cartItems) {
-        for (const item in cartItems[items]) {
-          if (cartItems[items][item] > 0) {
-            const itemInfo = structuredClone(
-              products.find((product) => product._id === items)
-            );
-            if (itemInfo) {
-              itemInfo.size = item;
-              itemInfo.quantity = cartItems[items][item];
-              orderItems.push(itemInfo);
+      const products = [];
+      for (const productId in cartItems) {
+        for (const size in cartItems[productId]) {
+          const quantity = cartItems[productId][size];
+          if (quantity > 0) {
+            const catalogueId = getCatalogueIdForProduct(productId);
+            if (!catalogueId) {
+              throw new Error(
+                `Could not find catalogue for product ${productId}`
+              );
             }
+
+            products.push({
+              productId,
+              catalogueId,
+              quantity,
+              size,
+            });
           }
         }
       }
 
-      let orderData = {
-        address: formData,
-        items: orderItems,
-        amount: getCartAmount() + delivery_fee,
-        isGroupOrder: acceptGroupOrder,
-        ecoPointsEarned,
-        co2Savings,
+      const address = {
+        line1: formData.street,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
       };
 
-      switch (method) {
-        case "cod":
-          const response = await axios.post(
-            `${backendUrl}/api/user/order`,
-            orderData,
-            { headers: { token } }
-          );
-          if (response.data.success) {
-            setCartItems({});
-            navigate("/orders", {
-              state: {
-                ecoPoints: orderData.ecoPointsEarned,
-                co2Savings: orderData.co2Savings,
-              },
-            });
-          } else {
-            toast.error(response.data.message);
-          }
-          break;
+      const orderData = {
+        address,
+        products,
+        isGroupOrder: acceptGroupOrder,
+      };
 
-        case "stripe":
-          const responseStripe = await axios.post(
-            `${backendUrl}/api/order/stripe`,
-            orderData,
-            { headers: { token } }
-          );
-          if (responseStripe.data.success) {
-            const { session_url } = responseStripe.data;
-            window.location.replace(session_url);
-          } else {
-            toast.error(responseStripe.data.message);
-          }
-          break;
+      console.log("Order payload:", orderData);
 
-        case "razorpay":
-          navigate("/underconstruction");
-          break;
+      const response = await axios.post(
+        `${backendUrl}/api/user/order`,
+        orderData,
+        getAuthHeaders()
+      );
 
-        default:
-          break;
+      if (response.data.message === "Order placed successfully") {
+        setCartItems({});
+        navigate("/orders", {
+          state: {
+            ecoPoints: response.data.ecoPoints,
+            co2Savings: response.data.co2Saved,
+          },
+        });
+        toast.success("Order placed successfully!");
+      } else {
+        throw new Error(response.data.message || "Order failed");
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      console.error("Order error:", {
+        error: error.message,
+        response: error.response?.data,
+      });
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again");
+        handleLogout();
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to place order. Please try again."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      {/* Group Order Modal */}
       {showGroupOrderModal && groupOrderAvailable && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
@@ -238,13 +244,11 @@ const PlaceOrder = () => {
         onSubmit={onSubmitHandler}
         className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t"
       >
-        {/* LEFT SIDE - Delivery Information */}
         <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
           <div className="text-xl sm:text-2xl my-3">
             <Title text1={"DELIVERY"} text2={"INFORMATION"} />
           </div>
 
-          {/* Eco Points Preview */}
           {ecoPointsEarned > 0 && (
             <div className="bg-green-50 border border-green-200 p-3 rounded-lg mb-4">
               <p className="font-medium text-green-800">
@@ -354,12 +358,10 @@ const PlaceOrder = () => {
           />
         </div>
 
-        {/* RIGHT SIDE - Order Summary */}
         <div className="mt-8">
           <div className="mt-8 min-w-80">
             <CartTotal />
 
-            {/* Group Order Status */}
             {acceptGroupOrder && (
               <div className="mt-4 bg-blue-50 p-3 rounded border border-blue-200">
                 <p className="text-blue-800 font-medium flex items-center">
@@ -373,7 +375,6 @@ const PlaceOrder = () => {
           <div className="mt-12">
             <Title text1={"PAYMENT"} text2={"METHOD"} />
 
-            {/* Payment Methods */}
             <div className="flex gap-3 flex-col lg:flex-row">
               <div
                 onClick={() => setMethod("cod")}
@@ -422,9 +423,10 @@ const PlaceOrder = () => {
             <div className="w-full text-end mt-8">
               <button
                 type="submit"
-                className="bg-black text-white px-16 py-3 text-sm"
+                className="bg-black text-white px-16 py-3 text-sm disabled:opacity-50"
+                disabled={isSubmitting}
               >
-                PLACE ORDER
+                {isSubmitting ? "Processing..." : "PLACE ORDER"}
               </button>
             </div>
           </div>
