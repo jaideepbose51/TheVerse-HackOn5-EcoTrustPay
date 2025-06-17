@@ -1,142 +1,298 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
-import RelatedProduct from "../components/RelatedProduct";
+import { toast } from "react-toastify";
+import QuantitySelector from "../components/QuantitySelector";
+import SizeSelector from "../components/SizeSelector";
+import ProductTabs from "../components/ProductTabs";
+import RelatedProducts from "../components/RelatedProducts";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 
-const Product = () => {
-  const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
-  const [productData, setProductData] = useState(false);
-  const [image, setImage] = useState("");
-  const [size, setSize] = useState("");
+const ProductPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const {
+    products,
+    addToCart,
+    cartItems,
+    updateQuantity,
+    token,
+    setToken,
+    currency,
+    checkProductAvailability,
+  } = useContext(ShopContext);
 
-  const fetchProductData = () => {
-    products.forEach((item) => {
-      if (item._id === productId) {
-        setProductData(item);
-        setImage(item.image[0]);
-      }
-    });
-  };
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [activeImage, setActiveImage] = useState(0);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
-    fetchProductData();
-  }, [productId, products]);
+    const fetchProductData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  return productData ? (
-    <div className="border-t-2 pt-10 transition-opacity ease-in-out duration-500 opacity-100">
-      {/*---------------- Product Display Section ----------------*/}
-      <div className="flex gap-12 flex-col sm:flex-row">
-        {/*---------------- Product Images ----------------*/}
-        <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
-          <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
-            {productData.image.map((item, index) => (
-              <img
-                onClick={() => setImage(item)}
-                src={item}
+        const foundProduct = products.find(
+          (p) => p._id === id || p.productId === id
+        );
+
+        if (!foundProduct) {
+          throw new Error("Product not found");
+        }
+
+        setProduct(foundProduct);
+
+        const related = products
+          .filter(
+            (p) =>
+              p.category === foundProduct.category &&
+              p._id !== foundProduct._id &&
+              p.productId !== foundProduct.productId
+          )
+          .slice(0, 4);
+
+        setRelatedProducts(related);
+      } catch (err) {
+        console.error("Product fetch error:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductData();
+  }, [id, products]);
+
+  const getCurrentCartQuantity = () => {
+    if (!product || !cartItems[product._id || product.productId]) return 0;
+    return Object.values(cartItems[product._id || product.productId]).reduce(
+      (sum, qty) => sum + qty,
+      0
+    );
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) {
+      toast.error("Product information not loaded");
+      return false;
+    }
+
+    const sizeToUse = product.sizes?.length > 0 ? selectedSize : "one-size";
+
+    if (product.sizes?.length > 0 && !selectedSize) {
+      toast.error("Please select a size");
+      return false;
+    }
+
+    if (
+      !checkProductAvailability(product._id || product.productId, sizeToUse)
+    ) {
+      toast.error("This product/size combination is not available");
+      return false;
+    }
+
+    try {
+      const { success, localOnly } = await addToCart(
+        product._id || product.productId,
+        sizeToUse
+      );
+
+      if (success) {
+        toast.success(
+          localOnly ? "Please sign in to add to cart." : "Added to cart"
+        );
+      }
+      return success;
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error("Failed to add to cart");
+      return false;
+    }
+  };
+
+  const handleBuyNow = async () => {
+    const { success, localOnly } = await handleAddToCart();
+    if (success) {
+      if (localOnly) {
+        toast.info("Proceeding with local cart");
+      }
+      navigate("/cart");
+    }
+  };
+
+  if (loading) return <LoadingSpinner fullPage />;
+  if (error) return <ErrorMessage message={error} fullPage />;
+  if (!product) return <ErrorMessage message="Product not found" fullPage />;
+
+  return (
+    <div className="container mx-auto py-8 px-4">
+      {/* Breadcrumbs */}
+      <nav className="flex mb-6 text-sm text-gray-600">
+        <ol className="inline-flex items-center space-x-1 md:space-x-2">
+          <li>
+            <button
+              onClick={() => navigate("/")}
+              className="hover:text-gray-900"
+            >
+              Home
+            </button>
+          </li>
+          <li>/</li>
+          <li>
+            <button
+              onClick={() =>
+                navigate(`/collection?category=${product.category}`)
+              }
+              className="hover:text-gray-900"
+            >
+              {product.category}
+            </button>
+          </li>
+          <li>/</li>
+          <li className="text-gray-900 font-medium">{product.name}</li>
+        </ol>
+      </nav>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Product Images */}
+        <div className="space-y-4">
+          {/* Main Image */}
+          <div className="bg-gray-100 rounded-lg overflow-hidden">
+            <img
+              src={product.images?.[activeImage] || assets.placeholder}
+              alt={product.name}
+              className="w-full h-96 object-contain"
+            />
+          </div>
+
+          {/* Thumbnails */}
+          <div className="grid grid-cols-4 gap-2">
+            {product.images?.map((img, index) => (
+              <button
                 key={index}
-                className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
-                alt="Product Thumbnail"
-              />
+                onClick={() => setActiveImage(index)}
+                className={`border-2 rounded-md overflow-hidden ${
+                  activeImage === index
+                    ? "border-primary"
+                    : "border-transparent"
+                }`}
+              >
+                <img
+                  src={img || assets.placeholder}
+                  alt={`${product.name} ${index + 1}`}
+                  className="w-full h-20 object-cover"
+                />
+              </button>
             ))}
           </div>
-          <div className="w-full sm:w-[80%]">
-            <img className="w-full h-auto" src={image} alt="Main Product" />
-          </div>
         </div>
 
-        {/*---------------- Product Info ----------------*/}
-        <div className="flex-1">
-          <h1 className="font-medium text-2xl mt-2">{productData.name}</h1>
+        {/* Product Info */}
+        <div>
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
 
-          {productData.ecoVerified && (
-            <div className="bg-green-100 text-green-800 px-3 py-1 text-xs inline-block rounded-full mt-2">
-              🌱 Eco Verified by AI
+            <div className="flex items-center space-x-4 mb-4">
+              {product.ecoVerified && (
+                <div className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full inline-flex items-center">
+                  <span className="mr-1">🌱</span> Eco Verified
+                </div>
+              )}
+              {product.bestseller && (
+                <div className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                  Bestseller
+                </div>
+              )}
             </div>
+
+            <p className="text-2xl font-semibold mb-4">
+              {currency}
+              {product.price.toFixed(2)}
+            </p>
+
+            {product.inStock ? (
+              <p className="text-green-600 mb-4">In Stock</p>
+            ) : (
+              <p className="text-red-600 mb-4">Out of Stock</p>
+            )}
+
+            <p className="text-gray-700 mb-6">{product.description}</p>
+          </div>
+
+          {/* Size Selector */}
+          {product.sizes?.length > 0 && (
+            <SizeSelector
+              sizes={product.sizes}
+              selectedSize={selectedSize}
+              onSelectSize={setSelectedSize}
+              className="mb-6"
+              inStock={product.inStock}
+            />
           )}
 
-          <div className="flex items-center gap-1 mt-2">
-            <img src={assets.star_icon} alt="star" className="w-3.5" />
-            <img src={assets.star_icon} alt="star" className="w-3.5" />
-            <img src={assets.star_icon} alt="star" className="w-3.5" />
-            <img src={assets.star_icon} alt="star" className="w-3.5" />
-            <img src={assets.star_dull_icon} alt="star" className="w-3.5" />
-            <p className="pl-2">122</p>
+          {/* Quantity and Add to Cart */}
+          <div className="flex items-center space-x-4 mb-8">
+            <QuantitySelector
+              quantity={quantity}
+              setQuantity={setQuantity}
+              maxQuantity={product.quantity || 10}
+            />
+
+            <button
+              onClick={handleAddToCart}
+              disabled={
+                !product.inStock || (product.sizes?.length > 0 && !selectedSize)
+              }
+              className={`px-6 py-3 rounded-md font-medium ${
+                product.inStock && (!product.sizes?.length > 0 || selectedSize)
+                  ? "bg-primary text-white hover:bg-primary-dark"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              {getCurrentCartQuantity() > 0
+                ? `Add More (${getCurrentCartQuantity()} in cart)`
+                : "Add to Cart"}
+            </button>
+
+            <button
+              onClick={handleBuyNow}
+              disabled={!product.inStock}
+              className={`px-6 py-3 rounded-md font-medium border ${
+                product.inStock
+                  ? "border-primary text-primary hover:bg-primary-light"
+                  : "border-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              Buy Now
+            </button>
           </div>
 
-          <p className="mt-5 text-3xl font-medium">
-            {currency}
-            {productData.price}
-          </p>
-
-          <p className="mt-5 text-gray-500 md:w-4/5">
-            {productData.description}
-          </p>
-
-          <div className="flex flex-col gap-4 my-8">
-            <p>Select Size</p>
-            <div className="flex gap-2">
-              {productData.sizes.map((item, index) => (
-                <button
-                  onClick={() => setSize(item)}
-                  className={`border py-2 px-4 bg-gray-100 ${
-                    item === size ? "border-orange-500" : ""
-                  }`}
-                  key={index}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button
-            onClick={() => addToCart(productData._id, size)}
-            className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
-          >
-            ADD TO CART
-          </button>
-
-          <hr className="mt-8 sm:w-4/5" />
-
-          <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
-            <p>✅ AI-verified for authenticity and sustainability.</p>
-            <p>✅ Cash on delivery available on this product.</p>
-            <p>✅ 7-day hassle-free return and eco-friendly exchange policy.</p>
+          {/* Product Details */}
+          <div className="border-t pt-6">
+            <ProductTabs
+              details={product.details}
+              specifications={product.specifications}
+              reviews={product.reviews}
+            />
           </div>
         </div>
       </div>
 
-      {/*---------------- Description & Review Section ----------------*/}
-      <div className="mt-20">
-        <div className="flex">
-          <p className="border px-5 py-3 text-sm font-medium">Description</p>
-          <p className="border px-5 py-3 text-sm">Reviews (122)</p>
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-6">You May Also Like</h2>
+          <RelatedProducts products={relatedProducts} />
         </div>
-        <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-600">
-          <p>
-            This product has been verified by EcoTrust Pay's AI-based validation
-            system. It meets sustainability standards and includes claims backed
-            by authentic certifications or seller history.
-          </p>
-          <p>
-            By choosing this item, you're supporting real climate impact — from
-            reduced packaging to smarter deliveries. Shop smart, shop
-            sustainably.
-          </p>
-        </div>
-      </div>
-
-      {/*---------------- Related Products ----------------*/}
-      <RelatedProduct
-        category={productData.category}
-        subCategory={productData.subCategory}
-      />
+      )}
     </div>
-  ) : (
-    <div className="opacity-0"></div>
   );
 };
 
-export default Product;
+export default ProductPage;

@@ -77,7 +77,7 @@ const List = () => {
           >
             <img
               className="w-12 h-12 object-cover rounded"
-              src={item.images?.[0] || item.image?.[0] || ""}
+              src={item.images?.[0] || item.images?.[0] || ""}
               alt={item.name}
             />
             <p>{item.name}</p>

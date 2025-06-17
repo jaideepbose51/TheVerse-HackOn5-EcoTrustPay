@@ -2,6 +2,7 @@ import User from "../model/userModel.js";
 import Catalogue from "../model/catalogueModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { z } from "zod";
 
 // 🔐 Zod validation schemas
@@ -84,47 +85,207 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-// ✅ Get User Cart
+const getUserCart = async (authToken) => {
+  try {
+    const res = await axios.get(`${backendUrl}/api/user/cart/get`, {
+      headers: {
+        Authorization: authToken,
+        "Content-Type": "application/json",
+      },
+      timeout: 5000, // Add timeout
+    });
+
+    if (res.data?.success) {
+      setCartItems(res.data.cartData || {});
+    } else {
+      throw new Error(res.data?.message || "Invalid cart data format");
+    }
+  } catch (err) {
+    console.error("Get cart error:", err);
+
+    // Handle specific error cases
+    if (err.response?.status === 401) {
+      toast.error("Session expired. Please login again");
+      setToken("");
+      localStorage.removeItem("token");
+    } else if (err.response?.status === 404) {
+      setCartItems({}); // Empty cart if not found
+    } else {
+      toast.error("Failed to load cart. Please refresh the page");
+    }
+
+    // Fallback to empty cart
+    setCartItems({});
+  }
+};
+
 export const getCart = async (req, res) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
     const user = await User.findById(req.user.id);
-    res.status(200).json({ success: true, cartData: user.cart });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Return empty cart if no items
+    if (!user.cart || user.cart.length === 0) {
+      return res.status(200).json({ success: true, cartData: {} });
+    }
+
+    // Transform cart data
+    const cartData = {};
+    for (const item of user.cart) {
+      if (!cartData[item.productId]) {
+        cartData[item.productId] = {};
+      }
+      cartData[item.productId][item.size || "one-size"] = item.quantity;
+    }
+
+    res.status(200).json({ success: true, cartData });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to get cart" });
+    console.error("Get cart error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get cart",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
   }
 };
 
-// ✅ Add to Cart
 export const addToCart = async (req, res) => {
   try {
-    const { productId, catalogueId, quantity } = req.body;
-    if (!productId || !catalogueId || !quantity) {
-      return res.status(400).json({ message: "All fields are required" });
+    const {
+      productId,
+      catalogueId,
+      quantity = 1,
+      size = "one-size",
+    } = req.body;
+
+    // Validate required fields
+    if (!productId || !catalogueId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: productId and catalogueId",
+      });
     }
 
+    // Validate ObjectId formats
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid productId format",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(catalogueId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid catalogueId format",
+      });
+    }
+
+    // Verify user exists
     const user = await User.findById(req.user.id);
-    const existing = user.cart.find(
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Verify catalogue exists
+    const catalogue = await Catalogue.findById(catalogueId);
+    if (!catalogue) {
+      return res.status(404).json({
+        success: false,
+        message: "Catalogue not found",
+      });
+    }
+
+    // Verify product exists in catalogue
+    const product = catalogue.products.id(productId);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found in catalogue",
+      });
+    }
+
+    // Check stock availability
+    if (!product.inStock) {
+      return res.status(400).json({
+        success: false,
+        message: "Product is out of stock",
+      });
+    }
+
+    // Validate size if product has sizes
+    if (
+      product.sizes &&
+      product.sizes.length > 0 &&
+      !product.sizes.includes(size)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid size selection",
+        availableSizes: product.sizes,
+      });
+    }
+
+    // Find existing cart item
+    const existingItemIndex = user.cart.findIndex(
       (item) =>
         item.productId.toString() === productId &&
-        item.catalogueId.toString() === catalogueId
+        item.catalogueId.toString() === catalogueId &&
+        item.size === size
     );
 
-    if (existing) {
-      existing.quantity += quantity;
+    // Update or add cart item
+    if (existingItemIndex >= 0) {
+      user.cart[existingItemIndex].quantity += quantity;
     } else {
-      user.cart.push({ productId, catalogueId, quantity });
+      user.cart.push({
+        productId: new mongoose.Types.ObjectId(productId),
+        catalogueId: new mongoose.Types.ObjectId(catalogueId),
+        quantity,
+        size,
+        addedAt: new Date(),
+      });
     }
 
-    await user.save();
-    res.status(200).json({ message: "Added to cart", cart: user.cart });
+    // Save changes
+    const savedUser = await user.save();
+
+    // Prepare response
+    const cartData = {};
+    savedUser.cart.forEach((item) => {
+      const pid = item.productId.toString();
+      if (!cartData[pid]) {
+        cartData[pid] = {};
+      }
+      cartData[pid][item.size] = item.quantity;
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Added to cart successfully",
+      cartData,
+    });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error adding to cart", error: err.message });
+    console.error("Add to cart error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
   }
 };
 
-// ❌ Remove from Cart
 export const removeFromCart = async (req, res) => {
   try {
     const { productId, catalogueId } = req.body;
@@ -196,11 +357,11 @@ export const getOrders = async (req, res) => {
   }
 };
 
-// ✅ Get all products from all catalogues
+// Updated getAllProducts function
 export const getAllProducts = async (req, res) => {
   try {
     const catalogues = await Catalogue.find().populate("seller", "name");
-
+    //Error
     const allProducts = [];
 
     catalogues.forEach((catalogue) => {
@@ -229,5 +390,49 @@ export const getAllProducts = async (req, res) => {
   } catch (err) {
     console.error("Error fetching products:", err);
     res.status(500).json({ message: "Failed to fetch products" });
+  }
+};
+
+// Add this to your userController.js
+export const getLatestProducts = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 8;
+
+    const catalogues = await Catalogue.aggregate([
+      { $unwind: "$products" },
+      { $sort: { "products.createdAt": -1 } },
+      { $limit: limit },
+      {
+        $project: {
+          _id: "$products._id",
+          name: "$products.name",
+          price: "$products.price",
+          images: "$products.images",
+          ecoVerified: "$products.ecoVerified",
+          createdAt: "$products.createdAt",
+          sellerId: "$seller",
+          category: "$category",
+          subCategory: "$subCategory",
+        },
+      },
+    ]);
+
+    // Populate seller info
+    await Catalogue.populate(catalogues, {
+      path: "sellerId",
+      select: "shopName",
+    });
+
+    res.json({
+      success: true,
+      count: catalogues.length,
+      products: catalogues,
+    });
+  } catch (err) {
+    console.error("Error fetching latest products:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch latest products",
+    });
   }
 };

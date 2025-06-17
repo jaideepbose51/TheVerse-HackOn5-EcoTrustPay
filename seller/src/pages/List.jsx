@@ -45,8 +45,8 @@ const List = ({ token }) => {
             </p>
             <p>
               {response.data.isEcoFriendly
-                ? "✅ Eco-friendly"
-                : "❌ Not eco-friendly"}
+                ? "Eco-friendly"
+                : "Not eco-friendly"}
             </p>
             <p>Confidence: {(response.data.confidence * 100).toFixed(0)}%</p>
             <p>Reason: {response.data.reason}</p>
@@ -77,17 +77,16 @@ const List = ({ token }) => {
     <>
       <p className="mb-2">All Products List</p>
       <div className="flex flex-col gap-2">
-        <div className="hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center px-2 py-1 border bg-gray-100 text-sm">
+        <div className="hidden md:grid grid-cols-[1fr_3fr_1fr_1fr] items-center px-2 py-1 border bg-gray-100 text-sm">
           <b>Image</b>
           <b>Name</b>
           <b>Category</b>
           <b>Price</b>
-          <b>Action</b>
         </div>
 
         {list.map((item, index) => (
           <div
-            className="grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-2 py-3 px-2 border text-sm"
+            className="grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr] items-center gap-2 py-3 px-2 border text-sm"
             key={index}
           >
             <img
@@ -138,12 +137,6 @@ const List = ({ token }) => {
                 className="md:hidden text-xs px-2 py-1 bg-blue-500 text-white rounded"
               >
                 {item.ecoVerified ? "✓" : "Verify"}
-              </button>
-              <button
-                onClick={() => removeProduct(item._id)}
-                className="text-lg text-red-500"
-              >
-                ×
               </button>
             </div>
           </div>

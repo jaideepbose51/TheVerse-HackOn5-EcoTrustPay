@@ -159,11 +159,12 @@ const Collection = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
           {filterProducts.map((item) => (
             <ProductItem
-              key={item.productId}
-              id={item.productId}
+              key={item._id || item.productId}
+              id={item._id || item.productId}
               name={item.name}
               price={item.price}
               images={item.images}
+              isEcoVerified={item.ecoVerified}
             />
           ))}
         </div>

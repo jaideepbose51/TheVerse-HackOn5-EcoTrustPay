@@ -17,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Verify from "./pages/Verify";
 import UnderConstruction from "./pages/UnderConstruction";
 import VerifiedDashboard from "./pages/VerifiedDashboard.jsx";
+import ProductPage from "./pages/Product";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/product/:productId" element={<Product />} />
+        <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/placeorder" element={<PlaceOrder />} />

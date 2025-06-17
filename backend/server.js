@@ -42,6 +42,11 @@ app.get("/", (req, res) => {
   res.status(200).send("✅ API is working");
 });
 
+import { errorHandler } from "./middleware/errorHandler.js";
+
+// ... after all your routes
+app.use(errorHandler);
+
 // Start server only after DB & Cloudinary connect
 const startServer = async () => {
   try {

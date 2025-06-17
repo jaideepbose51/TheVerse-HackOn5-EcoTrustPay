@@ -3,10 +3,17 @@ import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, navigate } =
-    useContext(ShopContext);
+  const {
+    products,
+    productsLoading,
+    currency,
+    cartItems,
+    updateQuantity,
+    navigate,
+  } = useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
 
   useEffect(() => {
@@ -23,10 +30,28 @@ const Cart = () => {
           }
         }
       }
-
       setCartData(tempData);
     }
   }, [cartItems, products]);
+
+  if (productsLoading) {
+    return <LoadingSpinner fullPage />;
+  }
+
+  if (cartData.length === 0) {
+    return (
+      <div className="border-t pt-14 text-center py-20">
+        <Title text1={"YOUR"} text2={"CART"} />
+        <p className="mt-4 text-gray-600">Your cart is empty</p>
+        <button
+          onClick={() => navigate("/")}
+          className="mt-6 bg-black text-white px-6 py-2 rounded"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="border-t pt-14">
@@ -37,8 +62,19 @@ const Cart = () => {
       <div>
         {cartData.map((item, index) => {
           const productData = products.find(
-            (product) => product._id === item._id
+            (product) =>
+              product._id === item._id || product.productId === item._id
           );
+
+          if (!productData) {
+            console.error("Product data not found for:", item._id);
+            return null;
+          }
+
+          const productImage = productData.images?.[0] || assets.placeholder;
+          const productName = productData.name || "Unknown Product";
+          const productPrice = productData.price || 0;
+
           return (
             <div
               key={index}
@@ -46,18 +82,18 @@ const Cart = () => {
             >
               <div className="flex items-start gap-6">
                 <img
-                  className="w-16 sm:w-20"
-                  src={productData.image[0]}
-                  alt="Product Image"
+                  className="w-16 sm:w-20 object-cover"
+                  src={productImage}
+                  alt={productName}
                 />
                 <div>
                   <p className="text-xs sm:text-lg font-medium">
-                    {productData.name}
+                    {productName}
                   </p>
                   <div className="flex items-center gap-5 mt-2">
                     <p>
                       {currency}
-                      {productData.price}
+                      {productPrice}
                     </p>
                     <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
                       {item.size}
@@ -66,25 +102,22 @@ const Cart = () => {
                 </div>
               </div>
               <input
-                onChange={(e) =>
-                  e.target.value === "" || e.target.value === ""
-                    ? null
-                    : updateQuantity(
-                        item._id,
-                        item.size,
-                        Number(e.target.value)
-                      )
-                }
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (!isNaN(value) && value >= 1) {
+                    updateQuantity(item._id, item.size, value);
+                  }
+                }}
                 className="border max-w-10 sm:max-w-20 px-1 py-1"
                 type="number"
                 min={1}
-                defaultValue={item.quantity}
+                value={item.quantity}
               />
               <img
                 className="w-4 mr-4 sm:w-5 cursor-pointer"
                 onClick={() => updateQuantity(item._id, item.size, 0)}
                 src={assets.bin_icon}
-                alt=""
+                alt="Remove item"
               />
             </div>
           );

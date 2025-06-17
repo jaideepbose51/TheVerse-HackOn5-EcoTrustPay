@@ -373,6 +373,9 @@ export const addProduct = async (req, res) => {
       images: imageUrls,
       ecoVerified,
       createdAt: new Date(),
+      isActive: true,
+      sellerId: seller._id,
+      sellerName: seller.shopName,
     };
 
     if (ecoClaim) {
@@ -386,6 +389,19 @@ export const addProduct = async (req, res) => {
 
     seller.products.push(newProduct);
     await seller.save();
+
+    const catalogueProduct = {
+      ...newProduct,
+      seller: seller._id,
+      category: baseValidated.category,
+      subCategory: baseValidated.subCategory,
+    };
+
+    await Catalogue.findOneAndUpdate(
+      { seller: seller._id },
+      { $push: { products: catalogueProduct } },
+      { upsert: true, new: true }
+    );
 
     res.status(201).json({
       success: true,
