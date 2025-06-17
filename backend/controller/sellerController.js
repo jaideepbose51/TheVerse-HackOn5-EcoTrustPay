@@ -283,22 +283,21 @@ export const addAdvancedSellerDetails = async (req, res) => {
     ]);
 
     // Normalize and validate categories
-let categoriesRaw = req.body.categories;
-let categories = [];
+    let categoriesRaw = req.body.categories;
+    let categories = [];
 
-if (Array.isArray(categoriesRaw)) {
-  categories = categoriesRaw;
-} else if (typeof categoriesRaw === "string") {
-  try {
-    const parsed = JSON.parse(categoriesRaw);
-    categories = Array.isArray(parsed) ? parsed : [parsed];
-  } catch {
-    categories = [categoriesRaw]; // Fallback if not JSON
-  }
-}
+    if (Array.isArray(categoriesRaw)) {
+      categories = categoriesRaw;
+    } else if (typeof categoriesRaw === "string") {
+      try {
+        const parsed = JSON.parse(categoriesRaw);
+        categories = Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        categories = [categoriesRaw]; // Fallback if not JSON
+      }
+    }
 
-
-    const allowedCategories = ['fashion', 'electronics', 'grocery']; // ✅ Your enum list here
+    const allowedCategories = ["fashion", "electronics", "grocery"]; // ✅ Your enum list here
     for (const category of categories) {
       if (!allowedCategories.includes(category)) {
         return res.status(400).json({
@@ -316,7 +315,8 @@ if (Array.isArray(categoriesRaw)) {
       if (!req.body.gstNumber || !req.body.sourceDetails) {
         return res.status(400).json({
           success: false,
-          message: "GST number and source details are required for branded sellers",
+          message:
+            "GST number and source details are required for branded sellers",
         });
       }
 
@@ -349,7 +349,8 @@ if (Array.isArray(categoriesRaw)) {
     res.status(200).json({
       success: true,
       message: "Verification submitted successfully",
-      nextSteps: "Your documents are under review. You'll be notified via email.",
+      nextSteps:
+        "Your documents are under review. You'll be notified via email.",
     });
   } catch (error) {
     console.error("Verification error:", error);
