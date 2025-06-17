@@ -19,14 +19,23 @@ const List = () => {
         },
       });
 
-      const data = response.data;
+      const catalogues = response.data;
 
-      if (Array.isArray(data)) {
-        setList(data);
+      if (Array.isArray(catalogues)) {
+        // Extract all products from all catalogues
+        const allProducts = catalogues.flatMap((catalogue) =>
+          catalogue.products.map((product) => ({
+            ...product,
+            catalogueId: catalogue._id,
+            category: catalogue.category,
+          }))
+        );
+
+        setList(allProducts);
         toast.success("Loaded Product List");
       } else {
         toast.error("Unexpected response format");
-        console.log("⚠️ Unexpected API response:", data);
+        console.log("⚠️ Unexpected API response:", catalogues);
       }
     } catch (err) {
       console.error("❌ Fetch error:", err);
@@ -34,17 +43,18 @@ const List = () => {
     }
   };
 
-  const removeProduct = async (id) => {
+  const removeProduct = async (productId) => {
     const token = localStorage.getItem("admin_token");
     if (!token) return toast.error("Admin not logged in");
 
     try {
-      // 🔁 Adjust this if you have a real delete/block route
-      await axios.delete(`${BASE_URL}/admin/catalogues/${id}`, {
+      // Note: You'll need to implement this endpoint in your backend
+      // It should handle deleting a specific product from a catalogue
+      await axios.delete(`${BASE_URL}/admin/products/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setList((prev) => prev.filter((item) => item._id !== id));
+      setList((prev) => prev.filter((item) => item._id !== productId));
       toast.success("Product removed");
     } catch (err) {
       console.error(err);
@@ -64,30 +74,28 @@ const List = () => {
         <div className="hidden md:grid grid-cols-[1fr_3fr_1.5fr_1fr_0.5fr] items-center px-2 py-1 border bg-gray-100 text-sm font-semibold">
           <span>Image</span>
           <span>Name</span>
-          <span>Category</span>
           <span>Price</span>
           <span>Delete</span>
         </div>
 
         {/* Products */}
-        {list.map((item) => (
+        {list.map((product) => (
           <div
-            key={item._id}
+            key={product._id}
             className="grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1.5fr_1fr_0.5fr] items-center gap-2 py-3 px-2 border text-sm"
           >
             <img
               className="w-12 h-12 object-cover rounded"
-              src={item.images?.[0] || item.images?.[0] || ""}
-              alt={item.name}
+              src={product.images?.[0] || ""}
+              alt={product.name}
             />
-            <p>{item.name}</p>
-            <p>{item.category}</p>
+            <p>{product.name}</p>
             <p>
               {currency}
-              {item.price}
+              {product.price}
             </p>
             <button
-              onClick={() => removeProduct(item._id)}
+              onClick={() => removeProduct(product._id)}
               className="text-red-500 text-lg font-bold text-right md:text-center"
             >
               X
