@@ -95,9 +95,6 @@ const Cart = () => {
                       {currency}
                       {productPrice}
                     </p>
-                    <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
-                      {item.size}
-                    </p>
                   </div>
                 </div>
               </div>

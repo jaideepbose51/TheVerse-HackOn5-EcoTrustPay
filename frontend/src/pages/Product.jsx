@@ -48,6 +48,11 @@ const ProductPage = () => {
 
         setProduct(foundProduct);
 
+        // Set default size if sizes are available
+        if (foundProduct.sizes?.length > 0) {
+          setSelectedSize(foundProduct.sizes[0]);
+        }
+
         const related = products
           .filter(
             (p) =>
@@ -69,6 +74,10 @@ const ProductPage = () => {
     fetchProductData();
   }, [id, products]);
 
+  // Check if name contains 'eco' (case-insensitive)
+  const hasEcoInName =
+    product?.name && product.name.toLowerCase().includes("eco");
+
   const getCurrentCartQuantity = () => {
     if (!product || !cartItems[product._id || product.productId]) return 0;
     return Object.values(cartItems[product._id || product.productId]).reduce(
@@ -83,19 +92,8 @@ const ProductPage = () => {
       return false;
     }
 
+    // Use selected size or 'one-size' if no sizes available
     const sizeToUse = product.sizes?.length > 0 ? selectedSize : "one-size";
-
-    if (product.sizes?.length > 0 && !selectedSize) {
-      toast.error("Please select a size");
-      return false;
-    }
-
-    if (
-      !checkProductAvailability(product._id || product.productId, sizeToUse)
-    ) {
-      toast.error("This product/size combination is not available");
-      return false;
-    }
 
     try {
       const { success, localOnly } = await addToCart(
@@ -199,9 +197,10 @@ const ProductPage = () => {
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
 
             <div className="flex items-center space-x-4 mb-4">
-              {product.ecoVerified && (
+              {(product.ecoVerified || hasEcoInName) && (
                 <div className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full inline-flex items-center">
-                  <span className="mr-1">🌱</span> Eco Verified
+                  <span className="mr-1">🌱</span>
+                  {product.ecoVerified ? "Eco Verified" : "Eco-Badge"}
                 </div>
               )}
               {product.bestseller && (
@@ -225,17 +224,6 @@ const ProductPage = () => {
             <p className="text-gray-700 mb-6">{product.description}</p>
           </div>
 
-          {/* Size Selector */}
-          {product.sizes?.length > 0 && (
-            <SizeSelector
-              sizes={product.sizes}
-              selectedSize={selectedSize}
-              onSelectSize={setSelectedSize}
-              className="mb-6"
-              inStock={product.inStock}
-            />
-          )}
-
           {/* Quantity and Add to Cart */}
           <div className="flex items-center space-x-4 mb-8">
             <QuantitySelector
@@ -246,11 +234,9 @@ const ProductPage = () => {
 
             <button
               onClick={handleAddToCart}
-              disabled={
-                !product.inStock || (product.sizes?.length > 0 && !selectedSize)
-              }
+              disabled={!product.inStock}
               className={`px-6 py-3 rounded-md font-medium ${
-                product.inStock && (!product.sizes?.length > 0 || selectedSize)
+                product.inStock
                   ? "bg-primary text-white hover:bg-primary-dark"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}

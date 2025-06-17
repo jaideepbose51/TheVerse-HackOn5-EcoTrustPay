@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 
 const ProductItem = ({ id, name, price, images, isEcoVerified }) => {
+  // Check if name contains 'eco' (case-insensitive)
+  const hasEcoInName = name && name.toLowerCase().includes("eco");
+
   return (
     <Link to={`/product/${id}`} className="group">
       <div className="relative">
@@ -14,9 +17,10 @@ const ProductItem = ({ id, name, price, images, isEcoVerified }) => {
             e.target.src = assets.placeholder;
           }}
         />
-        {isEcoVerified && (
+        {(isEcoVerified || hasEcoInName) && (
           <div className="absolute top-2 left-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center">
-            <span className="mr-1">🌱</span> Eco Verified
+            <span className="mr-1">🌱</span>
+            {isEcoVerified ? "Eco Verified" : "Eco-Badge"}
           </div>
         )}
       </div>
