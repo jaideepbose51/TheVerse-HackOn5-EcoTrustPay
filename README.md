@@ -32,11 +32,25 @@ EcoTrust Pay is a revolutionary sustainability-focused e-commerce platform that 
 
 <div align="center">
 
-[![EcoTrust Pay Demo](./assets/main-start.jpg)](https://youtu.be/teQLh4QTo_M)
+[![EcoTrust Pay Demo](./assets/video-play.jpg)](https://youtu.be/teQLh4QTo_M)
 
 _Click to watch our comprehensive platform walkthrough using slides_
 
 </div>
+
+---
+
+## 📄 Documentation
+
+The full project documentation and walkthrough is available here:  
+🔗 [https://your-hosted-link.com](https://your-hosted-link.com)
+
+This includes:
+
+- Live website
+- Feature walkthrough
+- User & Seller flows
+- Eco-verification demo
 
 ---
 
@@ -798,7 +812,6 @@ Our platform is built with sustainability in mind:
 - **🔍 Admin Verification:** Manual seller approval process
 
 ---
-
 
 <div align="center">
 
