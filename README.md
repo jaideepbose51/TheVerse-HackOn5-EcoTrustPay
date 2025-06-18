@@ -43,7 +43,7 @@ _Click to watch our comprehensive platform walkthrough using slides_
 ## 📄 Documentation
 
 The full project documentation and walkthrough is available here:  
-🔗 [https://your-hosted-link.com](https://your-hosted-link.com)
+🔗 [https://jaideepbose51.github.io/api-doc/](https://jaideepbose51.github.io/api-doc/)
 
 This includes:
 
