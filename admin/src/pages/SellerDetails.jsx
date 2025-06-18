@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = "https://theverse-hackon5-ecotrustpay-backend.onrender.com/api";
 
 const SellerDetails = () => {
   const { sellerId } = useParams();

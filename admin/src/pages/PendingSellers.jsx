@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = "https://theverse-hackon5-ecotrustpay-backend.onrender.com/api";
 
 const PendingSellers = () => {
   const [pendingSellers, setPendingSellers] = useState([]);

@@ -3,7 +3,7 @@ import { currency } from "../App";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = "https://theverse-hackon5-ecotrustpay-backend.onrender.com/api";
 
 const List = () => {
   const [list, setList] = useState([]);
