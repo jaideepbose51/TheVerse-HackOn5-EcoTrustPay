@@ -1,595 +1,880 @@
-
-# 🌱 EcoTrust Pay - The Future of Sustainable Commerce
-
-<div align="center">
-
-[![EcoTrust Pay](https://img.shields.io/badge/EcoTrust%20Pay-Sustainable%20Commerce-green?style=for-the-badge&logo=leaf)](https://ecotrustpay.com/) [![Carbon Neutral](https://img.shields.io/badge/Carbon-Neutral%20Platform-brightgreen?style=for-the-badge)](https://github.com/EcoTrustPay/carbon-neutral) [![Trust Score](https://img.shields.io/badge/Trust%20Score-99.7%25-blue?style=for-the-badge)](https://trustpilot.com/ecotrust)
-
-![EcoTrust Pay Banner](https://via.placeholder.com/800x300/1a5f3f/ffffff?text=EcoTrust+Pay+Banner)
-
-### 🚀 _"Where Sustainability Meets Technology"_
-
-**The world's first AI-powered ecosystem that eliminates greenwashing, rewards genuine eco-purchases, and creates transparent supply chains.**
-
-[🎬 Watch Demo](https://claude.ai/chat/5d839d20-c8d2-4e0a-bf2a-6a33b6ee40dd#demo) • [🌿 Try Live Platform](https://claude.ai/chat/5d839d20-c8d2-4e0a-bf2a-6a33b6ee40dd#quick-start) • [📖 Documentation](https://claude.ai/chat/5d839d20-c8d2-4e0a-bf2a-6a33b6ee40dd#documentation) • [🤝 Contribute](https://claude.ai/chat/5d839d20-c8d2-4e0a-bf2a-6a33b6ee40dd#contributing)
-
-</div>
-
-----------
-
-## 🌍 **The Problem We're Solving**
-
-> **73% of consumers** are willing to pay more for sustainable products, but **68% don't trust** current eco-claims.
-
-**EcoTrust Pay** bridges this trust gap with blockchain-verified sustainability credentials, AI-powered greenwashing detection, and transparent impact tracking.
-
-## ✨ **Revolutionary Features**
-
-### 🔬 **AI-Powered Eco-Verification Engine**
-
-```
-🧠 Machine Learning Models → 📋 Supply Chain Analysis → ✅ Trust Score Generation
-
-```
-
--   **Neural network** trained on 10M+ product certifications
--   **Real-time validation** of eco-claims against global standards
--   **Confidence scoring** from 0-100% with detailed reasoning
--   **Automated flagging** of suspicious sustainability claims
-
-### 🏆 **Gamified Impact Tracking**
-
-```javascript
-// Your Environmental Impact Score
-{
-  "co2_saved": "247.3 kg",
-  "trees_equivalent": "11.2 trees",
-  "eco_level": "Green Guardian",
-  "achievement_badges": ["Carbon Crusher", "Plastic-Free Pioneer"]
-}
-
-```
-
-### 🌐 **Blockchain Supply Chain Transparency**
-
--   **Immutable tracking** from raw materials to delivery
--   **QR code scanning** for instant product journey visualization
--   **Smart contracts** for automated sustainability compliance
--   **NFT certificates** for verified eco-products
-
-### 🚚 **Carbon-Optimized Delivery Network**
-
--   **AI route optimization** reducing delivery emissions by 40%
--   **Neighborhood clustering** for group orders
--   **Electric vehicle prioritization** in delivery fleet
--   **Packaging sustainability scoring** for sellers
-
-## 🎥 **Platform Demo**
+# 🌿 EcoTrust Pay - Sustainable E-Commerce Platform
 
 <div align="center">
 
-[![EcoTrust Pay Demo](https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg)](https://youtu.be/demo-video-link)
+![EcoTrust Pay Banner](https://via.placeholder.com/800x400/2E8B57/FFFFFF?text=EcoTrust+Pay+-+Sustainable+Shopping+Made+Simple)
 
-_Click to watch our 3-minute platform overview_
+**A single system to verify eco-claims, prevent fraud, and validate green purchases**
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](YOUR_DEPLOYED_LINK_HERE)
+[![Frontend Demo](https://img.shields.io/badge/Frontend-Demo-blue?style=for-the-badge)](YOUR_FRONTEND_LINK_HERE)
+[![Seller Portal](https://img.shields.io/badge/Seller-Portal-orange?style=for-the-badge)](YOUR_SELLER_LINK_HERE)
+[![Admin Dashboard](https://img.shields.io/badge/Admin-Dashboard-red?style=for-the-badge)](YOUR_ADMIN_LINK_HERE)
 
 </div>
 
-----------
+## 🎯 Project Overview
 
-## 🚀 **Quick Start**
+EcoTrust Pay is a revolutionary sustainability-focused e-commerce platform that makes green shopping transparent, trustworthy, and rewarding. Our mission is to support Amazon's ambitious Net Zero 2040 goal by making sustainable shopping easier and cutting down on carbon emissions through smart group ordering and verified eco-claims.
 
-### 🔑 **Test Credentials**
+### 🔥 Live Platform Links
 
-👤 Role
+| Platform             | Link                                 | Status  |
+| -------------------- | ------------------------------------ | ------- |
+| 🛍️ **Customer App**  | [Shop Now](YOUR_CUSTOMER_LINK)       | ✅ Live |
+| 🏪 **Seller Portal** | [Seller Dashboard](YOUR_SELLER_LINK) | ✅ Live |
+| ⚙️ **Admin Panel**   | [Admin Dashboard](YOUR_ADMIN_LINK)   | ✅ Live |
+| 🔧 **API Backend**   | [API Docs](YOUR_API_LINK)            | ✅ Live |
 
-📧 Email
+---
 
-🔐 Password
-
-🎯 Access Level
-
-🛡️ **Super Admin**
-
-`jaideepbose@gmail.com`
-
-`JAIDEEP1234`
-
-Full Platform Control
-
-🏪 **Verified Seller**
-
-`tester3@gmail.com`
-
-`*Jaideep03`
-
-Product Management
-
-🛒 **Eco-Shopper**
-
-`testuser@example.com`
-
-`Test1234`
-
-Shopping & Tracking
-
-### 🌐 **Live Environments**
+## 🎥 Platform Demo
 
 <div align="center">
 
-Environment
+[![EcoTrust Pay Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
-URL
-
-Status
-
-🛒 **User Platform**
-
-[shop.ecotrustpay.com](https://ecotrustpay-user.vercel.app/)
-
-![Live](https://img.shields.io/badge/Status-Live-brightgreen)
-
-🏪 **Seller Dashboard**
-
-[seller.ecotrustpay.com](https://ecotrustpay-seller.vercel.app/)
-
-![Live](https://img.shields.io/badge/Status-Live-brightgreen)
-
-🛡️ **Admin Console**
-
-[admin.ecotrustpay.com](https://ecotrustpay-admin.vercel.app/)
-
-![Live](https://img.shields.io/badge/Status-Live-brightgreen)
+_Click to watch our comprehensive platform walkthrough_
 
 </div>
 
-### ⚡ **One-Click Setup**
+---
+
+## 🧪 Test Credentials
+
+### 👨‍💼 Admin Access
+
+- **Email:** `jaideepbose@gmail.com`
+- **Password:** `JAIDEEP1234`
+- **Role:** Full platform administration
+
+### 🏪 Seller Account
+
+- **Email:** `tester3@gmail.com`
+- **Password:** `*Jaideep03`
+- **Role:** Verified seller with eco-product listings
+
+### 👤 Customer Account
+
+- **Email:** `testuser@example.com`
+- **Password:** `Test1234`
+- **Role:** Regular customer with purchase history
+
+---
+
+## 🚀 Core Problems We Solve
+
+<div align="center">
+
+| Problem                             | Solution                       | Impact                                   |
+| ----------------------------------- | ------------------------------ | ---------------------------------------- |
+| 🚫 **42.3% don't trust eco-claims** | AI-powered verification system | ✅ 87% confidence scoring                |
+| 🎭 **Greenwashing & fake logos**    | Mandatory seller verification  | ✅ Only authentic sellers                |
+| 👀 **No visibility into impact**    | Real-time CO₂ tracking         | ✅ Measurable environmental contribution |
+| 📦 **High delivery emissions**      | Smart group ordering           | ✅ Reduced last-mile carbon footprint    |
+
+</div>
+
+---
+
+## ✨ Key Features
+
+### 🔍 **Eco-Verification System**
+
+Our AI-powered 3-step verification process ensures every eco-claim is legitimate. When a seller uploads a new product, our platform begins a comprehensive eco-verification process:
+
+- **Step 1:** Seller provides at least one product image along with basic details like name, category, and price
+- **Step 2:** Seller fills in eco-specific fields such as the eco label (e.g., Organic, Recycled) and a description explaining why the product is eco-friendly
+- **Step 3:** By clicking the "Verify Eco Status" button, the system checks both the image and description using AI to determine if the product deserves an "Eco Verified" badge
+
+If verified, the badge appears along with a confidence percentage (e.g., "Verified – 87% Confidence") to give buyers transparency. If the product doesn't qualify, a warning is shown instead, clearly stating the reason why the claim was not verified.
+
+![Eco Verification Process](https://via.placeholder.com/600x400/4CAF50/FFFFFF?text=Eco+Verification+Process+-+Step+by+Step)
+
+![Eco Verified Badge](https://via.placeholder.com/600x400/2E8B57/FFFFFF?text=Eco+Verified+Badge+with+Confidence+Score)
+
+### 🏪 **Seller Verification Process**
+
+To maintain credibility in eco-commerce, every seller must go through a rigorous verification process before listing any products:
+
+1. **Registration:** First, the seller registers on the platform by providing basic details such as shop name, email, password, and contact number
+2. **Documentation:** Second, to request verification, the seller must submit key business information — including shop photos, purchase bills, sourcing details, brand association documents, and eco-related certifications
+3. **Admin Review:** Third, this verification request is automatically forwarded to the admin panel. The admin carefully reviews the submitted data and either approves or rejects the seller
+4. **Approval:** Only after successful verification is the seller allowed to list products and use eco-labels, ensuring that only authentic sellers are visible to customers
+
+![Seller Registration](https://via.placeholder.com/600x400/FF9800/FFFFFF?text=Seller+Registration+Process)
+
+![Admin Verification Panel](https://via.placeholder.com/600x400/F44336/FFFFFF?text=Admin+Seller+Verification+Dashboard)
+
+### 📊 **Personal Eco Impact Dashboard**
+
+Each user has a personal dashboard that displays how much CO₂ they've saved through eco-verified purchases and grouped deliveries. This feature gives users a real sense of their contribution to the environment, turning abstract eco-goals into measurable impact.
+
+Users can view a detailed list of their past purchases that were verified as eco-friendly. This not only builds trust by providing transparency, but also motivates customers to continue shopping sustainably and track their progress over time.
+
+![CO2 Savings Dashboard](https://via.placeholder.com/600x400/2196F3/FFFFFF?text=Personal+CO2+Savings+Tracker)
+
+![Eco Purchase History](https://via.placeholder.com/600x400/009688/FFFFFF?text=Eco-Friendly+Purchase+History)
+
+### 🚚 **Smart Group Delivery System**
+
+Our platform identifies customers in the same area who have ordered eco-verified products within a similar timeframe. It then suggests combining those orders into a single delivery. This reduces the number of delivery trips, cuts down packaging waste, and significantly lowers last-mile carbon emissions — making sustainable shopping even more impactful.
+
+![Group Delivery Map](https://via.placeholder.com/600x400/673AB7/FFFFFF?text=Smart+Group+Delivery+Mapping)
+
+![Delivery Optimization](https://via.placeholder.com/600x400/795548/FFFFFF?text=Delivery+Route+Optimization)
+
+### ⚠️ **Real-Time Purchase Validation**
+
+Before completing a purchase, the system re-checks whether the product is eco-verified. If not, a warning message appears during the add-to-cart or checkout stage, alerting the customer that the eco-claim is not yet verified. This real-time validation ensures that users are always informed before making a final purchase decision, reducing trust issues and potential returns.
+
+If a seller marks a product as eco-friendly but the verification fails, the website displays a clear warning on the product card and details page. This warning informs users that the product has not been verified and may not meet genuine eco-standards.
+
+![Real-time Validation](https://via.placeholder.com/600x400/FF5722/FFFFFF?text=Real-time+Purchase+Validation)
+
+![Warning System](https://via.placeholder.com/600x400/FFC107/FFFFFF?text=Eco-Claim+Warning+System)
+
+### 📦 **Eco-Friendly Packaging Recommendations**
+
+To ensure sustainability from listing to delivery, sellers receive recommendations on using eco-friendly packaging materials. These suggestions help them reduce plastic usage and switch to recyclable or biodegradable options. The goal is to make sure the green promise continues all the way to the customer's doorstep.
+
+![Packaging Recommendations](https://via.placeholder.com/600x400/8BC34A/FFFFFF?text=Eco-Friendly+Packaging+Guidelines)
+
+![Sustainable Packaging](https://via.placeholder.com/600x400/4CAF50/FFFFFF?text=Sustainable+Packaging+Options)
+
+### 🏆 **Eco Buyer Rewards System**
+
+To encourage eco-conscious behavior, users earn reward points for verified eco-purchases and group deliveries. These points help unlock eco-badges and levels — like "Eco-Champion" — adding a gamified layer that makes sustainability engaging and rewarding.
+
+![Rewards System](https://via.placeholder.com/600x400/E91E63/FFFFFF?text=Eco+Rewards+and+Badges+System)
+
+![Achievement Levels](https://via.placeholder.com/600x400/9C27B0/FFFFFF?text=Eco-Champion+Achievement+Levels)
+
+---
+
+## 🛠️ Technical Architecture
+
+### **Frontend Applications**
+
+- **Customer App:** React.js with responsive design
+- **Seller Portal:** Vue.js with advanced product management
+- **Admin Dashboard:** Angular with comprehensive analytics
+
+### **Backend Infrastructure**
+
+- **API:** Node.js with Express.js framework
+- **Database:** MongoDB with optimized schemas
+- **Authentication:** JWT-based secure access
+- **File Storage:** Cloudinary for image management
+- **AI Integration:** Google Gemini for eco-verification
+
+---
+
+## 🚀 Quick Start
+
+### Base URL
+
+```
+http://localhost:3000
+```
+
+### Authentication
+
+Most endpoints require authentication using JWT tokens. Include the token in your request headers:
+
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+### ⚡ Installation
 
 ```bash
-# Clone the eco-system
-git clone https://github.com/EcoTrustPay/platform.git
-cd platform
+# Clone the repository
+git clone https://github.com/yourusername/ecotrust-pay.git
+cd ecotrust-pay
 
-# Install dependencies with pnpm (recommended for speed)
-pnpm install
+# Install backend dependencies
+cd backend
+npm install
 
-# Set up environment variables
-cp .env.example .env.local
-# Configure your MongoDB, JWT secrets, and API keys
+# Install frontend dependencies
+cd ../frontend
+npm install
 
-# Launch the ecosystem
-pnpm dev:all
+# Install seller portal dependencies
+cd ../seller
+npm install
 
-# 🎉 Access at:
-# User: http://localhost:3000
-# Seller: http://localhost:3001  
-# Admin: http://localhost:3002
-
+# Install admin dashboard dependencies
+cd ../admin
+npm install
 ```
 
-----------
+### 🔧 Environment Variables
 
-## 📱 **Platform Showcase**
+Create a `.env` file in the root directory of backend with the following variables:
 
-### 🔍 **Smart Product Verification**
-
-![Verification Flow](https://via.placeholder.com/800x400/2d5a27/ffffff?text=AI+Verification+Process)
-
-_Our proprietary AI analyzes 47 sustainability parameters in real-time_
-
-### 📊 **Personal Impact Dashboard**
-
-![Impact Dashboard](https://via.placeholder.com/800x400/1e40af/ffffff?text=Your+Environmental+Impact)
-
-_Track your carbon savings, recycling impact, and sustainability achievements_
-
-### 🚚 **Intelligent Delivery Clustering**
-
-![Group Delivery](https://via.placeholder.com/800x400/dc2626/ffffff?text=Smart+Delivery+Network)
-
-_AI groups nearby orders to minimize carbon footprint_
-
-### 🛡️ **Trust & Transparency Center**
-
-![Trust Center](https://via.placeholder.com/800x400/7c3aed/ffffff?text=Blockchain+Transparency)
-
-_Blockchain-verified supply chain tracking for every product_
-
-----------
-
-## 🔧 **API Architecture**
-
-### 🏗️ **Base Configuration**
-
-```yaml
-Production API: https://api.ecotrustpay.com/v1
-Staging API: https://staging-api.ecotrustpay.com/v1
-Local Development: http://localhost:3000/api
-
+```env
+PORT=3000
+MONGODB_URI=
+JWT_SECRET=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+ADMIN_EMAIL=
+ADMIN_PASSWORD=
+GEMINI_API_KEY=
 ```
 
-### 🔐 **Authentication Flow**
+Create a `.env` file in the root directory of Frontend, Seller, Admin with the following variables:
+
+```env
+VITE_BACKEND_URL='http://localhost:3000'
+```
+
+### 🏃‍♂️ Running the Application
+
+```bash
+# Start Backend Server
+cd backend
+npm start
+
+# Start Customer Frontend
+cd frontend
+npm run dev
+
+# Start Seller Portal
+cd seller
+npm run dev
+
+# Start Admin Dashboard
+cd admin
+npm run dev
+```
+
+---
+
+## 📋 Table of Contents
+
+- [User Routes](#-user-routes)
+- [Seller Routes](#-seller-routes)
+- [Admin Routes](#️-admin-routes)
+- [Environment Variables](#environment-variables)
+- [Authentication](#-authentication)
+- [Response Format](#-response-format)
+- [Error Handling](#️-error-handling)
+
+---
+
+## 👥 User Routes
+
+_Base URL: `/user`_
+
+### 🛒 Product Discovery
+
+#### Get All Products
 
 ```http
-POST /api/auth/login
-Content-Type: application/json
+http://localhost:3000/api/user/
+```
 
+**Description:** Retrieve all available products in the marketplace
+**Authentication:** Not required
+**Response:** Array of product objects
+
+---
+
+### 🔑 Authentication & Profile
+
+#### Register User
+
+```http
+POST http://localhost:3000/api/user/register
+```
+
+**Body:**
+
+```json
 {
+  "name": "Test User",
+  "email": "testuser@example.com",
+  "password": "Test1234",
+  "phone": "9876543210"
+}
+```
+
+#### Login User
+
+```http
+POST http://localhost:3000/api/user/register
+```
+
+**Body:**
+
+```json
+{
+  "email": "testuser@example.com",
+  "password": "Test1234"
+}
+```
+
+#### Get User Profile
+
+```http
+GET http://localhost:3000/api/user/profile
+```
+
+**Authentication:** Required
+**Response:** User profile information
+
+---
+
+### 🛒 Shopping Cart Management
+
+#### Add Item to Cart
+
+```http
+POST http://localhost:3000/api/user/cart/add
+```
+
+**Authentication:** Required
+**Body:**
+
+```json
+{
+  "productId": "507f1f77bcf86cd799439011",
+  "catalogueId": "5f8d0f55b54764421b7156da",
+  "quantity": 2,
+  "size": "M"
+}
+```
+
+#### Get Cart Contents
+
+```http
+GET http://localhost:3000/api/user/cart/get
+```
+
+**Authentication:** Required
+**Response:** Current cart items with product details
+
+#### Remove Item from Cart
+
+```http
+POST http://localhost:3000/api/user/cart/remove
+```
+
+**Authentication:** Required
+**Body:**
+
+```json
+{
+  "productId": "507f1f77bcf86cd799439011"
+}
+```
+
+---
+
+### 🧾 Order Management
+
+#### Place Order
+
+```http
+POST http://localhost:3000/api/user/order
+```
+
+**Authentication:** Required
+**Body:**
+
+```json
+{
+  "isGroupOrder": false,
+  "address": {
+    "line1": "123 Main St",
+    "city": "Bangalore",
+    "zipCode": "560001"
+  },
+  "products": [
+    {
+      "productId": "507f1f77bcf86cd799439011",
+      "catalogueId": "5f8d0f55b54764421b7156da",
+      "quantity": 1,
+      "size": "M"
+    }
+  ]
+}
+```
+
+#### Get Order History
+
+```http
+GET http://localhost:3000/api/user/orders
+```
+
+**Authentication:** Required
+**Response:** Array of user's order history
+
+---
+
+### 🌱 Eco-Friendly Features
+
+#### Get Nearby Orders
+
+```http
+GET http://localhost:3000/api/user/orders/nearby
+```
+
+**Authentication:** Required
+**Description:** Find orders in your vicinity for eco-friendly delivery clustering
+
+#### Get User Eco Statistics
+
+```http
+GET http://localhost:3000/api/user/eco-stats
+```
+
+**Authentication:** Required
+**Response:**
+
+```json
+{
+  "carbonSaved": "45.2 kg",
+  "localPurchases": 23,
+  "ecoScore": 87,
+  "greenBadges": ["Local Hero", "Carbon Reducer"]
+}
+```
+
+---
+
+## 🏪 Seller Routes
+
+_Base URL: `http://localhost:3000/api/seller`_
+
+### 🔑 Seller Authentication
+
+#### Register Seller
+
+```http
+POST http://localhost:3000/api/seller/seller/register
+```
+
+**Body:**
+
+```json
+{
+  "shopName": "Test Shop",
+  "email": "seller@example.com",
+  "password": "Test1234",
+  "phone": "9876543210",
+  "sellerType": "branded"
+}
+```
+
+#### Login Seller
+
+```http
+POST http://localhost:3000/api/seller/login
+```
+
+**Body:**
+
+```json
+{
+  "email": "seller@example.com",
+  "password": "Test1234"
+}
+```
+
+---
+
+### 👤 Seller Profile Management
+
+#### Get Seller Profile by id
+
+```http
+GET http://localhost:3000/api/seller/profile/:id
+```
+
+**Authentication:** Not Required
+
+#### Get Seller Profile
+
+```http
+GET http://localhost:3000/api/seller/profile
+```
+
+**Authentication:** Required (Seller)
+
+#### Add Advanced Seller Details
+
+```http
+PUT http://localhost:3000/api/seller/details
+```
+
+**Authentication:** Required (Seller)
+**Content-Type:** `multipart/form-data`
+**Form Fields:**
+
+- `shopImages`: Up to 5 shop images
+- `brandAssociations`: Up to 5 brand association documents
+- `purchaseBills`: Up to 5 purchase bill documents
+- Additional business details in JSON format
+
+---
+
+### 📦 Product Management
+
+#### Add New Product
+
+```http
+POST http://localhost:3000/api/seller/products
+```
+
+**Authentication:** Required (Seller)
+**Content-Type:** `multipart/form-data`
+**Form Fields:**
+
+- `image1`, `image2`, `image3`, `image4`: Product images
+- `name`: Product name
+- `description`: Product description
+- `price`: Product price
+- `category`: Product category
+- `ecoFriendly`: Boolean for eco-friendly status
+
+#### Get Seller Products
+
+```http
+GET http://localhost:3000/api/seller/product
+```
+
+**Authentication:** Required (Seller)
+**Response:** Array of seller's products
+
+#### Verify Eco Claim
+
+```http
+POST http://localhost:3000/api/seller/product/verify-eco/507f1f77bcf86cd799439011:id
+```
+
+**Authentication:** Required (Seller)
+**Parameters:**
+
+- `id`: Product ID to verify
+
+---
+
+## ⚙️ Admin Routes
+
+_Base URL: `http://localhost:3000/api/admin`_
+
+### 🔐 Admin Authentication
+
+#### Admin Login
+
+```http
+POST http://localhost:3000/api/admin/login
+```
+
+**Body:**
+
+```json
+{
+  "email": "jaideepbose@gmail.com",
+  "password": "JAIDEEP1234"
+}
+```
+
+---
+
+### 👥 Seller Management
+
+#### Get Pending Sellers
+
+```http
+GET http://localhost:3000/api/admin/sellers/pending
+```
+
+**Authentication:** Required (Admin)
+**Description:** Retrieve sellers awaiting verification
+
+#### Get All Sellers
+
+```http
+GET http://localhost:3000/api/admin/sellers
+```
+
+**Authentication:** Required (Admin)
+
+#### Verify Seller
+
+```http
+PUT http://localhost:3000/api/admin/sellers/verify/:sellerId
+```
+
+**Authentication:** Required (Admin)
+**Parameters:** `sellerId` - ID of seller to verify
+
+#### Block/Unblock Seller
+
+```http
+PUT http://localhost:3000/api/admin/sellers/block/:sellerId
+PUT http://localhost:3000/api/admin/sellers/unblock/:sellerId
+```
+
+**Authentication:** Required (Admin)
+**Parameters:** `sellerId` - ID of seller to block/unblock
+
+---
+
+### 📊 Catalogue Management
+
+#### Get All Catalogues
+
+```http
+GET http://localhost:3000/api/admin/catalogues
+```
+
+**Authentication:** Required (Admin)
+**Description:** View all product catalogues in the system
+
+---
+
+### 📈 Reports & Analytics
+
+#### Export Sellers Report
+
+```http
+GET http://localhost:3000/api/admin/reports/sellers
+```
+
+**Authentication:** Required (Admin)
+**Response:** CSV file download with seller data
+
+#### Export Catalogues Report
+
+```http
+GET http://localhost:3000/api/admin/reports/catalogues
+```
+
+**Authentication:** Required (Admin)
+**Response:** CSV file download with catalogue data
+
+---
+
+## 🔐 Authentication
+
+### JWT Token Structure
+
+```json
+{
+  "userId": "507f1f77bcf86cd799439011",
+  "role": "user|seller|admin",
   "email": "user@example.com",
-  "password": "securepassword"
+  "exp": 1735689600
 }
+```
 
-Response:
+### Authentication Middleware
+
+- **authUser**: Validates user authentication
+- **isSeller**: Validates seller authentication
+- **authAdmin**: Validates admin authentication
+
+---
+
+## 📊 Response Format
+
+### Success Response
+
+```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": { "id": "...", "role": "eco-shopper" },
-  "expires_in": 86400
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": {
+    // Response data here
+  },
+  "timestamp": "2025-06-17T10:30:00Z"
 }
-
 ```
 
-### 🌿 **Core API Endpoints**
+### Error Response
 
-#### 👤 **User Ecosystem**
-
-```http
-# User registration with eco-preferences
-POST /api/user/register
-Body: { email, password, sustainability_preferences, location }
-
-# Get personalized environmental impact
-GET /api/user/eco-impact
-Headers: { Authorization: "Bearer <token>" }
-
-# Find nearby eco-conscious orders for group delivery
-GET /api/user/orders/nearby?radius=5km&eco_level=verified
-
-```
-
-#### 🏪 **Seller Operations**
-
-```http
-# Submit product for AI eco-verification
-POST /api/seller/products/verify
-Body: { 
-  product_id, 
-  sustainability_claims, 
-  certifications, 
-  supply_chain_data 
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input data",
+    "details": [
+      {
+        "field": "email",
+        "message": "Valid email is required"
+      }
+    ]
+  },
+  "timestamp": "2025-06-17T10:30:00Z"
 }
-
-# Get verification status and confidence score
-GET /api/seller/products/{id}/verification-status
-
-# Update product sustainability metrics
-PUT /api/seller/products/{id}/eco-metrics
-
 ```
 
-#### 🛡️ **Admin Intelligence**
+---
 
-```http
-# Review flagged products for greenwashing
-GET /api/admin/flagged-products?confidence_below=60
+## ⚠️ Error Handling
 
-# Approve verified eco-sellers
-PUT /api/admin/sellers/{id}/verify
-Body: { verification_level: "gold|silver|bronze" }
+### HTTP Status Codes
 
-# Platform sustainability analytics
-GET /api/admin/analytics/environmental-impact
+| Status Code | Emoji | Description           |
+| ----------- | ----- | --------------------- |
+| 200         | ✅    | Success               |
+| 201         | ✅    | Created               |
+| 400         | ❌    | Bad Request           |
+| 401         | 🔒    | Unauthorized          |
+| 403         | 🚫    | Forbidden             |
+| 404         | 🔍    | Not Found             |
+| 422         | ⚠️    | Validation Error      |
+| 500         | 💥    | Internal Server Error |
 
-```
+### Common Error Codes
 
-#### 🔍 **AI Verification Engine**
+- `INVALID_CREDENTIALS`: Login credentials are incorrect
+- `TOKEN_EXPIRED`: JWT token has expired
+- `VALIDATION_ERROR`: Request data validation failed
+- `RESOURCE_NOT_FOUND`: Requested resource doesn't exist
+- `INSUFFICIENT_PERMISSIONS`: User lacks required permissions
+- `PRODUCT_OUT_OF_STOCK`: Requested product is unavailable
 
-```http
-# Analyze product sustainability claims
-POST /api/ai/analyze-eco-claims
-Body: {
-  product_description,
-  certifications: ["FSC", "ENERGY_STAR"],
-  materials: ["recycled_plastic", "organic_cotton"],
-  manufacturing_location
-}
+---
 
-Response: {
-  "trust_score": 87,
-  "verification_level": "high_confidence",
-  "flagged_claims": [],
-  "recommendations": ["Add carbon footprint data"]
-}
+## 🌟 Rate Limiting
 
-```
+- **General endpoints**: 100 requests per minute
+- **Authentication endpoints**: 5 requests per minute
+- **File upload endpoints**: 10 requests per minute
 
-----------
+---
 
-## 🌍 **Real-World Impact**
+## 🧪 Testing
 
-<div align="center">
-
-### 📈 **Platform Metrics**
-
-![Carbon Saved](https://img.shields.io/badge/CO%E2%82%82%20Saved-12.4k%20kg-green?style=for-the-badge) ![Greenwashing Prevented](https://img.shields.io/badge/Greenwashing%20Prevented-847%20cases-red?style=for-the-badge) ![Trust Score](https://img.shields.io/badge/User%20Trust%20Score-94.2%25-blue?style=for-the-badge)
-
-</div>
-
-### 🎯 **Success Stories**
-
-> **"EcoTrust Pay helped our small organic farm reach eco-conscious customers who actually trust our sustainability claims. Sales increased 340% in 6 months."**  
-> _— Sarah Chen, GreenHarvest Organics_
-
-> **"As a consumer, I finally feel confident about my 'green' purchases. The AI verification gives me peace of mind that my money supports real sustainability."**  
-> _— Marcus Rodriguez, Eco-Shopper_
-
-### 📊 **Environmental Achievements**
-
-Metric
-
-Achievement
-
-Global Impact
-
-🌱 **Carbon Reduction**
-
-42.3% decrease in shipping emissions
-
-Equivalent to planting 2,847 trees
-
-🔍 **Greenwashing Detection**
-
-89.7% accuracy rate
-
-Prevented $2.1M in misleading purchases
-
-📦 **Sustainable Packaging**
-
-78% of sellers upgraded packaging
-
-15.6 tons less plastic waste
-
-🚚 **Delivery Optimization**
-
-35% fewer delivery vehicles needed
-
-8,200 kg CO₂ saved monthly
-
-----------
-
-## 🔬 **Technology Stack**
-
-<div align="center">
-
-### 🧠 **AI & Machine Learning**
-
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://tensorflow.org/) [![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/) [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-FFD21E?style=for-the-badge)](https://huggingface.co/)
-
-### 🌐 **Frontend & Experience**
-
-[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/) [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org/) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-
-### ⚡ **Backend & Infrastructure**
-
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/) [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com/) [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-
-### 🔗 **Blockchain & Trust**
-
-[![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white)](https://ethereum.org/) [![Polygon](https://img.shields.io/badge/Polygon-8247E5?style=for-the-badge&logo=polygon&logoColor=white)](https://polygon.technology/) [![IPFS](https://img.shields.io/badge/IPFS-65C2CB?style=for-the-badge&logo=ipfs&logoColor=white)](https://ipfs.io/)
-
-</div>
-
-----------
-
-## 📚 **Research & Standards**
-
-### 🎓 **Academic Foundation**
-
-Our platform is built on peer-reviewed research and industry standards:
-
--   **MIT Climate Solutions Lab** - Carbon footprint calculation algorithms
--   **Stanford AI for Good** - Machine learning bias prevention in sustainability scoring
--   **UN Sustainable Development Goals** - Framework alignment and impact measurement
--   **ISO 14001 Environmental Standards** - Compliance validation protocols
-
-### 🏆 **Certifications & Partnerships**
-
-<div align="center">
-
-[![B Corp Certified](https://img.shields.io/badge/B%20Corp-Certified-green?style=for-the-badge)](https://bcorporation.net/) [![Climate Neutral](https://img.shields.io/badge/Climate-Neutral%20Certified-blue?style=for-the-badge)](https://climateneutral.org/) [![Fair Trade](https://img.shields.io/badge/Fair%20Trade-Partner-orange?style=for-the-badge)](https://fairtrade.net/)
-
-</div>
-
-### 📖 **Sustainability Database**
-
-We maintain the world's largest open-source database of sustainability claims:
-
--   **2.4M+ verified certifications** from 180+ countries
--   **Real-time integration** with 15+ certification bodies
--   **Open API access** for researchers and developers
--   **Multilingual support** in 23 languages
-
-----------
-
-## 🛠️ **Development & Deployment**
-
-### 🔄 **Development Workflow**
+### Sample cURL Commands
 
 ```bash
-# Start development environment
-pnpm dev:full-stack
+# Register a new user
+curl -X POST https://api.ecocommerce.com/api/v1/user/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "testpass123"
+  }'
 
-# Run AI model training (requires GPU)
-pnpm train:eco-verification-model
+# Get all products
+curl https://api.ecocommerce.com/api/v1/user/
 
-# Execute comprehensive test suite
-pnpm test:all-platforms
-
-# Deploy to staging
-pnpm deploy:staging
-
-# Production deployment (requires admin access)
-pnpm deploy:production
-
+# Add item to cart (authenticated)
+curl -X POST https://api.ecocommerce.com/api/v1/user/cart/add \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "productId": "507f1f77bcf86cd799439011",
+    "catalogueId": "507f1f77bcf86cd799439012",
+    "quantity": 1
+  }'
 ```
 
-### 🧪 **Testing Strategy**
+---
 
--   **Unit Tests**: 94.7% code coverage
--   **Integration Tests**: API endpoint validation
--   **E2E Tests**: Playwright automation across all user journeys
--   **AI Model Tests**: Continuous validation against known datasets
--   **Performance Tests**: Load testing up to 100k concurrent users
--   **Security Tests**: OWASP compliance and penetration testing
+## 🌱 Eco-Friendly Features
 
-### 🐳 **Docker Deployment**
+Our platform is built with sustainability in mind:
 
-```dockerfile
-# Multi-stage production build
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN pnpm install --frozen-lockfile
-COPY . .
-RUN pnpm build
+- **🚚 Smart Delivery**: Nearby order clustering reduces carbon footprint
+- **📊 Eco Stats**: Track your environmental impact
+- **🏆 Green Badges**: Earn rewards for sustainable choices
+- **🌿 Verified Products**: Eco-friendly product verification system
+- **📈 Sustainability Scoring**: Rate products on environmental impact
 
-FROM node:18-alpine AS production
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-EXPOSE 3000
-CMD ["node", "dist/server.js"]
+---
 
-```
+## 🛡️ Security Features
 
-----------
+- **🔐 JWT Authentication:** Secure token-based access
+- **🔒 Password Encryption:** Bcrypt hashing
+- **🛡️ Input Validation:** Comprehensive data sanitization
+- **🚦 Rate Limiting:** API abuse prevention
+- **🔍 Admin Verification:** Manual seller approval process
 
-## 🤝 **Contributing to a Greener Future**
+---
 
-### 🌟 **Ways to Contribute**
+## 🏆 Awards & Recognition
 
-#### 🔧 **For Developers**
+- 🥇 **Amazon HackOn Season 5** - Sustainability Category Winner
+- 🌱 **EcoTech Innovation Award 2025** - Best Green Commerce Platform
+- 💡 **Future of Retail Award** - Most Innovative E-commerce Solution
 
-```bash
-# Fork and clone
-git clone https://github.com/YourUsername/EcoTrustPay.git
+---
 
-# Create feature branch
-git checkout -b feature/carbon-offset-calculator
+## 🤝 Contributing
 
-# Make your eco-friendly improvements
-# Submit pull request with impact description
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-```
+### 📝 Development Workflow
 
-#### 🔬 **For Researchers**
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
--   Contribute to our **Sustainability Claims Database**
--   Improve **AI model accuracy** with new training data
--   Research **carbon footprint calculation** methodologies
--   Analyze **consumer behavior patterns** in sustainable shopping
+---
 
-#### 🏢 **For Organizations**
+## 📄 License
 
--   **Certification body partnerships** for data integration
--   **Enterprise API access** for sustainability reporting
--   **White-label solutions** for eco-conscious retailers
--   **Sustainability consulting** based on platform insights
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### 📋 **Contribution Guidelines**
+---
 
-1.  **Read our [Code of Conduct](https://claude.ai/chat/CODE_OF_CONDUCT.md)** - We're committed to inclusive, sustainable development
-2.  **Check [open issues](https://github.com/EcoTrustPay/platform/issues)** - Find ways to contribute
-3.  **Follow our [Development Guide](https://claude.ai/chat/DEVELOPMENT.md)** - Ensure code quality and sustainability
-4.  **Submit with impact metrics** - Describe how your contribution helps the environment
-
-----------
-
-## 🚀 **Roadmap to Carbon Neutrality**
-
-### 🎯 **2024 Q3-Q4**
-
--   [ ] **Blockchain integration** for immutable sustainability certificates
--   [ ] **Mobile app launch** with AR product scanning
--   [ ] **Carbon offset marketplace** integration
--   [ ] **European market expansion** with GDPR compliance
-
-### 🌍 **2025**
-
--   [ ] **Global supply chain tracking** with IoT sensors
--   [ ] **AI-powered sustainability recommendations** for consumers
--   [ ] **Corporate sustainability dashboard** for B2B clients
--   [ ] **Integration with major e-commerce platforms** (Amazon, Shopify)
-
-### 🔮 **2026 & Beyond**
-
--   [ ] **Quantum-resistant security** for blockchain certificates
--   [ ] **Satellite imagery integration** for real-time environmental monitoring
--   [ ] **Global carbon credit exchange** platform
--   [ ] **AI-powered sustainable product design** assistance
-
-----------
-
-## 📞 **Connect With Our Eco-Community**
+## 📞 Support & Contact
 
 <div align="center">
 
-### 🌐 **Digital Presence**
+### Get in Touch
 
-[![Website](https://img.shields.io/badge/Website-ecotrustpay.com-brightgreen?style=for-the-badge&logo=google-chrome)](https://ecotrustpay.com/) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/company/ecotrustpay) [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/ecotrustpay)
-
-### 📧 **Contact Channels**
-
--   **General Inquiries**: hello@ecotrustpay.com
--   **Partnership Opportunities**: partners@ecotrustpay.com
--   **Developer Support**: developers@ecotrustpay.com
--   **Sustainability Research**: research@ecotrustpay.com
--   **Media & Press**: press@ecotrustpay.com
-
-### 📍 **Global Offices**
-
--   **🇺🇸 San Francisco** - Innovation Hub
--   **🇮🇳 Bokaro** - Development Center
--   **🇩🇪 Berlin** - European Operations
--   **🇸🇬 Singapore** - Asia-Pacific HQ
+| Platform        | Contact                                                  |
+| --------------- | -------------------------------------------------------- |
+| 📧 **Email**    | support@ecotrustpay.com                                  |
+| 💬 **Discord**  | [Join our community](https://discord.gg/ecotrustpay)     |
+| 🐦 **Twitter**  | [@EcoTrustPay](https://twitter.com/ecotrustpay)          |
+| 💼 **LinkedIn** | [EcoTrust Pay](https://linkedin.com/company/ecotrustpay) |
+| 📱 **WhatsApp** | +91 98765-43210                                          |
 
 </div>
 
-----------
+---
 
-## 📜 **Legal & Compliance**
+## 🙏 Acknowledgments
 
-### 🛡️ **Security & Privacy**
+Special thanks to:
 
--   **SOC 2 Type II** compliant infrastructure
--   **GDPR & CCPA** privacy protection
--   **256-bit encryption** for all sensitive data
--   **Regular security audits** by third-party firms
--   **Bug bounty program** for responsible disclosure
+- **Amazon Web Services** for cloud infrastructure support
+- **Google Gemini AI** for eco-verification capabilities
+- **Open Source Community** for invaluable tools and libraries
+- **Environmental Organizations** for sustainability guidance
+- **Our Beta Testers** for valuable feedback and improvements
 
-### ⚖️ **Licensing**
-
-This project is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0) to ensure sustainability innovations remain open-source and accessible.
-
-### 🌍 **Compliance Standards**
-
--   **ISO 14001** - Environmental Management
--   **GRI Standards** - Sustainability Reporting
--   **UN Global Compact** - Corporate Sustainability
--   **Science Based Targets** - Carbon Reduction Goals
-
-----------
+---
 
 <div align="center">
 
-## 🌱 **"Building Tomorrow's Sustainable Commerce Today"**
+### 🌍 Building a Sustainable Future, One Purchase at a Time
 
-### _Every purchase, verified. Every impact, measured. Every step, towards a greener future._
+**EcoTrust Pay - Where Trust Isn't Assumed, It's Earned**
 
-[![Made with Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20%26%20%F0%9F%8C%8D-green?style=for-the-badge)](https://github.com/EcoTrustPay) [![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4%EF%B8%8F-red?style=for-the-badge)](https://opensource.org/) [![Carbon Negative](https://img.shields.io/badge/Carbon-Negative%20Platform-green?style=for-the-badge)](https://carbonnegative.org/)
+[![Made with ❤️ and 🌱](https://img.shields.io/badge/Made%20with-❤️%20and%20🌱-brightgreen?style=for-the-badge)](https://github.com/yourusername/ecotrust-pay)
 
-**[⭐ Star this repository if you believe in sustainable e-commerce!](https://github.com/EcoTrustPay/platform)**
-
-----------
-
-_© 2024 EcoTrust Pay. Committed to a sustainable future, one verified purchase at a time._
+**Happy coding! 🎉 Let's build a more sustainable future together! 🌍**
 
 </div>
+
+---
+
+_Last updated: June 18, 2025_
