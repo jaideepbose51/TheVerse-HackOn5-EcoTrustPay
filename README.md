@@ -24,7 +24,7 @@ EcoTrust Pay is a revolutionary sustainability-focused e-commerce platform that 
 | 🛍️ **Customer App**  | [Shop Now](https://theverse-hackon5-ecotrustpay-frontend.onrender.com/)       | ✅ Live |
 | 🏪 **Seller Portal** | [Seller Dashboard](https://theverse-hackon5-ecotrustpay-seller.onrender.com/) | ✅ Live |
 | ⚙️ **Admin Panel**   | [Admin Dashboard](https://theverse-hackon5-ecotrustpay-admin.onrender.com/)   | ✅ Live |
-| 🔧 **API Backend**   | [API Docs](https://theverse-hackon5-ecotrustpay-backend.onrender.com/)        | ✅ Live |
+| 🔧 **API Backend**   | [API Docs](https://jaideepbose51.github.io/api-doc/)                          | ✅ Live |
 
 ---
 
