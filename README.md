@@ -6,10 +6,10 @@
 
 **A single system to verify eco-claims, prevent fraud, and validate green purchases**
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](YOUR_DEPLOYED_LINK_HERE)
-[![Frontend Demo](https://img.shields.io/badge/Frontend-Demo-blue?style=for-the-badge)](YOUR_FRONTEND_LINK_HERE)
-[![Seller Portal](https://img.shields.io/badge/Seller-Portal-orange?style=for-the-badge)](YOUR_SELLER_LINK_HERE)
-[![Admin Dashboard](https://img.shields.io/badge/Admin-Dashboard-red?style=for-the-badge)](YOUR_ADMIN_LINK_HERE)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-frontend.onrender.com/)
+[![Frontend Demo](https://img.shields.io/badge/Frontend-Demo-blue?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-frontend.onrender.com/)
+[![Seller Portal](https://img.shields.io/badge/Seller-Portal-orange?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-seller.onrender.com/)
+[![Admin Dashboard](https://img.shields.io/badge/Admin-Dashboard-red?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-admin.onrender.com/)
 
 </div>
 
@@ -19,12 +19,12 @@ EcoTrust Pay is a revolutionary sustainability-focused e-commerce platform that 
 
 ### 🔥 Live Platform Links
 
-| Platform             | Link                                 | Status  |
-| -------------------- | ------------------------------------ | ------- |
-| 🛍️ **Customer App**  | [Shop Now](YOUR_CUSTOMER_LINK)       | ✅ Live |
-| 🏪 **Seller Portal** | [Seller Dashboard](YOUR_SELLER_LINK) | ✅ Live |
-| ⚙️ **Admin Panel**   | [Admin Dashboard](YOUR_ADMIN_LINK)   | ✅ Live |
-| 🔧 **API Backend**   | [API Docs](YOUR_API_LINK)            | ✅ Live |
+| Platform             | Link                                                                          | Status  |
+| -------------------- | ----------------------------------------------------------------------------- | ------- |
+| 🛍️ **Customer App**  | [Shop Now](https://theverse-hackon5-ecotrustpay-frontend.onrender.com/)       | ✅ Live |
+| 🏪 **Seller Portal** | [Seller Dashboard](https://theverse-hackon5-ecotrustpay-seller.onrender.com/) | ✅ Live |
+| ⚙️ **Admin Panel**   | [Admin Dashboard](https://theverse-hackon5-ecotrustpay-admin.onrender.com/)   | ✅ Live |
+| 🔧 **API Backend**   | [API Docs](https://theverse-hackon5-ecotrustpay-backend.onrender.com/)        | ✅ Live |
 
 ---
 
@@ -34,7 +34,7 @@ EcoTrust Pay is a revolutionary sustainability-focused e-commerce platform that 
 
 [![EcoTrust Pay Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
-_Click to watch our comprehensive platform walkthrough_
+_Click to watch our comprehensive platform walkthrough using slides_
 
 </div>
 
