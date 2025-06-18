@@ -70,8 +70,10 @@ This includes:
 
 ### 👤 Customer Account
 
-- **Email:** `testuser@example.com`
-- **Password:** `Test1234`
+- **Email:** `ayush@gmail.com`
+- **Password:** `Ayush123`
+- **Group Delivery Check PIN Code:** `800011 or 751024`
+- **Group Delivery Manual Check:** Order to same PIN Code twice
 - **Role:** Regular customer with purchase history
 
 ---
