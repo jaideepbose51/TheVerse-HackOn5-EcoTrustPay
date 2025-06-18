@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![EcoTrust Pay Banner](https://via.placeholder.com/800x400/2E8B57/FFFFFF?text=EcoTrust+Pay+-+Sustainable+Shopping+Made+Simple)
+![EcoTrust Pay Banner](./assets/main-start.jpg)
 
 **A single system to verify eco-claims, prevent fraud, and validate green purchases**
 
@@ -89,9 +89,9 @@ Our AI-powered 3-step verification process ensures every eco-claim is legitimate
 
 If verified, the badge appears along with a confidence percentage (e.g., "Verified – 87% Confidence") to give buyers transparency. If the product doesn't qualify, a warning is shown instead, clearly stating the reason why the claim was not verified.
 
-![Eco Verification Process](https://via.placeholder.com/600x400/4CAF50/FFFFFF?text=Eco+Verification+Process+-+Step+by+Step)
+![Eco Verification Process](./assets/eco-verify-process.jpg)
 
-![Eco Verified Badge](https://via.placeholder.com/600x400/2E8B57/FFFFFF?text=Eco+Verified+Badge+with+Confidence+Score)
+![Eco Verified Badge](./assets/eco-verify-badge.png)
 
 ### 🏪 **Seller Verification Process**
 
@@ -102,9 +102,11 @@ To maintain credibility in eco-commerce, every seller must go through a rigorous
 3. **Admin Review:** Third, this verification request is automatically forwarded to the admin panel. The admin carefully reviews the submitted data and either approves or rejects the seller
 4. **Approval:** Only after successful verification is the seller allowed to list products and use eco-labels, ensuring that only authentic sellers are visible to customers
 
-![Seller Registration](https://via.placeholder.com/600x400/FF9800/FFFFFF?text=Seller+Registration+Process)
+![Seller Verification](./assets/seller-ver-slide.jpg)
 
-![Admin Verification Panel](https://via.placeholder.com/600x400/F44336/FFFFFF?text=Admin+Seller+Verification+Dashboard)
+![Seller Registration](./assets/seller-ver.png)
+
+![Admin Verification Panel](./assets/admin-pending-ver.png)
 
 ### 📊 **Personal Eco Impact Dashboard**
 
@@ -112,17 +114,17 @@ Each user has a personal dashboard that displays how much CO₂ they've saved th
 
 Users can view a detailed list of their past purchases that were verified as eco-friendly. This not only builds trust by providing transparency, but also motivates customers to continue shopping sustainably and track their progress over time.
 
-![CO2 Savings Dashboard](https://via.placeholder.com/600x400/2196F3/FFFFFF?text=Personal+CO2+Savings+Tracker)
+![CO2 Savings Dashboard](./assets/co2-dash-slide.jpg)
 
-![Eco Purchase History](https://via.placeholder.com/600x400/009688/FFFFFF?text=Eco-Friendly+Purchase+History)
+![Eco Purchase History](./assets/co2-dash.png)
 
 ### 🚚 **Smart Group Delivery System**
 
 Our platform identifies customers in the same area who have ordered eco-verified products within a similar timeframe. It then suggests combining those orders into a single delivery. This reduces the number of delivery trips, cuts down packaging waste, and significantly lowers last-mile carbon emissions — making sustainable shopping even more impactful.
 
-![Group Delivery Map](https://via.placeholder.com/600x400/673AB7/FFFFFF?text=Smart+Group+Delivery+Mapping)
+![Group Delivery Map](./assets/group-del-slide.jpg)
 
-![Delivery Optimization](https://via.placeholder.com/600x400/795548/FFFFFF?text=Delivery+Route+Optimization)
+![Delivery Optimization](./assets/group-del.png)
 
 ### ⚠️ **Real-Time Purchase Validation**
 
@@ -130,25 +132,17 @@ Before completing a purchase, the system re-checks whether the product is eco-ve
 
 If a seller marks a product as eco-friendly but the verification fails, the website displays a clear warning on the product card and details page. This warning informs users that the product has not been verified and may not meet genuine eco-standards.
 
-![Real-time Validation](https://via.placeholder.com/600x400/FF5722/FFFFFF?text=Real-time+Purchase+Validation)
+![Real-time Validation](./assets/prod-ver-slide.jpg)
 
-![Warning System](https://via.placeholder.com/600x400/FFC107/FFFFFF?text=Eco-Claim+Warning+System)
-
-### 📦 **Eco-Friendly Packaging Recommendations**
-
-To ensure sustainability from listing to delivery, sellers receive recommendations on using eco-friendly packaging materials. These suggestions help them reduce plastic usage and switch to recyclable or biodegradable options. The goal is to make sure the green promise continues all the way to the customer's doorstep.
-
-![Packaging Recommendations](https://via.placeholder.com/600x400/8BC34A/FFFFFF?text=Eco-Friendly+Packaging+Guidelines)
-
-![Sustainable Packaging](https://via.placeholder.com/600x400/4CAF50/FFFFFF?text=Sustainable+Packaging+Options)
+![Warning System](./assets/prod-ver.png)
 
 ### 🏆 **Eco Buyer Rewards System**
 
 To encourage eco-conscious behavior, users earn reward points for verified eco-purchases and group deliveries. These points help unlock eco-badges and levels — like "Eco-Champion" — adding a gamified layer that makes sustainability engaging and rewarding.
 
-![Rewards System](https://via.placeholder.com/600x400/E91E63/FFFFFF?text=Eco+Rewards+and+Badges+System)
+![Rewards System](./assets/eco-rew-slide.jpg)
 
-![Achievement Levels](https://via.placeholder.com/600x400/9C27B0/FFFFFF?text=Eco-Champion+Achievement+Levels)
+![Achievement Levels](./assets/co2-dash.png)
 
 ---
 
@@ -190,7 +184,7 @@ Authorization: Bearer <your_jwt_token>
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ecotrust-pay.git
+git clone https://github.com/jaideepbose51/TheVerse-HackOn5-EcoTrustPay
 cd ecotrust-pay
 
 # Install backend dependencies
