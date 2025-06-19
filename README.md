@@ -32,9 +32,9 @@ EcoTrust Pay is a revolutionary sustainability-focused e-commerce platform that 
 
 <div align="center">
 
-[![EcoTrust Pay Demo](./assets/video-play.jpg)](https://youtu.be/teQLh4QTo_M)
+[![EcoTrust Pay Demo](./assets/video-play.jpg)](https://youtu.be/yApPTYxYPiU?si=AUdVj05OYvK-Q8hF)
 
-_Click to watch our comprehensive platform walkthrough using slides_
+_Click to watch our comprehensive platform walkthrough and demo_
 
 </div>
 
@@ -247,7 +247,7 @@ VITE_BACKEND_URL='http://localhost:3000'
 ```bash
 # Start Backend Server
 cd backend
-npm start
+npm run dev
 
 # Start Customer Frontend
 cd frontend
@@ -829,4 +829,4 @@ Our platform is built with sustainability in mind:
 
 ---
 
-_Last updated: June 18, 2025_
+_Last updated: June 19, 2025_
