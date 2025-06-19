@@ -830,3 +830,8 @@ Our platform is built with sustainability in mind:
 ---
 
 _Last updated: June 19, 2025_
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
