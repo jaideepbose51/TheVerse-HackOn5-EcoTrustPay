@@ -13,6 +13,7 @@ import {
   getSellerReviews,
   replyToReview,
   getProductReviews,
+  analyzeProductReviews,
 } from "../controller/sellerController.js";
 import { isSeller } from "../middleware/auth.js";
 import { validateObjectId } from "../middleware/validateObjectId.js";
@@ -74,6 +75,12 @@ router.get(
     next();
   },
   getProductReviews
+);
+
+router.get(
+  "/products/:productId/analyze-reviews",
+  isSeller,
+  analyzeProductReviews
 );
 
 export default router;

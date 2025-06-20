@@ -10,6 +10,8 @@ const List = ({ token }) => {
   const [reviews, setReviews] = useState([]);
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const [analysis, setAnalysis] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
 
   const fetchList = async () => {
     try {
@@ -44,12 +46,36 @@ const List = ({ token }) => {
 
       if (response.data?.success) {
         setReviews(response.data.reviews);
+        setAnalysis(null); // Reset analysis when fetching new reviews
       } else {
         toast.error(response.data?.message || "Failed to load reviews");
       }
     } catch (error) {
       console.error("Fetch error:", error);
       toast.error("Error loading reviews");
+    }
+  };
+
+  const analyzeReviews = async () => {
+    if (!selectedProduct) return;
+
+    setAnalyzing(true);
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/seller/products/${selectedProduct._id}/analyze-reviews`,
+        { headers: { Authorization: token } }
+      );
+
+      if (response.data.success) {
+        setAnalysis(response.data.analysis);
+      } else {
+        toast.error(response.data.message || "Analysis failed");
+      }
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.error("Failed to analyze reviews");
+    } finally {
+      setAnalyzing(false);
     }
   };
 
@@ -138,6 +164,7 @@ const List = ({ token }) => {
     setReviews([]);
     setReplyingTo(null);
     setReplyText("");
+    setAnalysis(null);
   };
 
   useEffect(() => {
@@ -371,6 +398,164 @@ const List = ({ token }) => {
                         </p>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Review Analysis Section */}
+              <div className="border-t pt-4 mt-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold">Review Insights</h3>
+                  <button
+                    onClick={analyzeReviews}
+                    disabled={analyzing || reviews.length === 0}
+                    className={`px-3 py-1 text-sm rounded ${
+                      analyzing || reviews.length === 0
+                        ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                        : "bg-purple-600 text-white hover:bg-purple-700"
+                    }`}
+                  >
+                    {analyzing ? "Analyzing..." : "Generate Insights"}
+                  </button>
+                </div>
+
+                {analysis ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Positive Aspects */}
+                      <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 className="font-bold text-green-800 mb-3 flex items-center">
+                          <svg
+                            className="w-5 h-5 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          What Customers Like
+                        </h4>
+                        <ul className="space-y-2">
+                          {analysis.positiveAspects.map((item, i) => (
+                            <li key={i} className="text-sm">
+                              <span className="font-medium text-green-700">
+                                {item.aspect}
+                              </span>
+                              <span className="text-xs text-green-600 ml-2">
+                                ({item.mentions} mentions)
+                              </span>
+                              <p className="text-xs text-gray-600 mt-1 italic">
+                                "{item.example}"
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Negative Aspects */}
+                      <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h4 className="font-bold text-red-800 mb-3 flex items-center">
+                          <svg
+                            className="w-5 h-5 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Areas for Improvement
+                        </h4>
+                        <ul className="space-y-2">
+                          {analysis.negativeAspects.map((item, i) => (
+                            <li key={i} className="text-sm">
+                              <span className="font-medium text-red-700">
+                                {item.aspect}
+                              </span>
+                              <span className="text-xs text-red-600 ml-2">
+                                ({item.mentions} mentions)
+                              </span>
+                              <p className="text-xs text-gray-600 mt-1 italic">
+                                "{item.example}"
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Sentiment Score */}
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <h4 className="font-bold text-blue-800 mb-2">
+                        Overall Sentiment
+                      </h4>
+                      <div className="flex items-center">
+                        <div className="w-full bg-gray-200 rounded-full h-4 mr-3">
+                          <div
+                            className="bg-blue-600 h-4 rounded-full"
+                            style={{ width: `${analysis.sentimentScore}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm font-medium text-blue-700">
+                          {analysis.sentimentScore}/100
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2">
+                        {analysis.sentimentScore >= 70
+                          ? "Very Positive"
+                          : analysis.sentimentScore >= 40
+                          ? "Mixed"
+                          : "Mostly Negative"}
+                      </p>
+                    </div>
+
+                    {/* Improvement Suggestions */}
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <h4 className="font-bold text-yellow-800 mb-2 flex items-center">
+                        <svg
+                          className="w-5 h-5 mr-1"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        Suggested Improvements
+                      </h4>
+                      <ul className="list-disc pl-5 space-y-1 text-sm">
+                        {analysis.improvementSuggestions.map(
+                          (suggestion, i) => (
+                            <li key={i} className="text-gray-700">
+                              {suggestion}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* Summary */}
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <h4 className="font-bold text-gray-800 mb-2">Summary</h4>
+                      <p className="text-sm text-gray-700">
+                        {analysis.summary}
+                      </p>
+                    </div>
+                  </div>
+                ) : reviews.length > 0 ? (
+                  <div className="text-center py-6 text-gray-500">
+                    Click "Generate Insights" to analyze customer feedback
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-gray-500">
+                    No reviews available for analysis
                   </div>
                 )}
               </div>

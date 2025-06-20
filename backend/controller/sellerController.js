@@ -31,6 +31,132 @@ const fetchImageAsBase64 = async (imageUrl) => {
   }
 };
 
+// Analyze product reviews for sentiment and key insights
+export const analyzeProductReviews = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const sellerId = req.user.id;
+
+    // Verify seller owns the product
+    const seller = await Seller.findOne({
+      _id: sellerId,
+      "products._id": productId,
+    });
+
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found for this seller",
+      });
+    }
+
+    // Get all reviews for this product
+    const catalogues = await Catalogue.find({}).populate(
+      "products.reviews.userId",
+      "name"
+    );
+
+    let allReviews = [];
+    catalogues.forEach((catalogue) => {
+      const matchedProduct = catalogue.products.find(
+        (p) => p.name === seller.products.id(productId).name
+      );
+      if (matchedProduct?.reviews?.length) {
+        allReviews.push(
+          ...matchedProduct.reviews.map((r) => ({
+            text: `${r.title}. ${r.comment}`,
+            rating: r.rating,
+            isVerified: r.isVerifiedPurchase,
+          }))
+        );
+      }
+    });
+
+    if (allReviews.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No reviews to analyze",
+        analysis: null,
+      });
+    }
+
+    // Prepare data for Gemini
+    const reviewTexts = allReviews.map((r) => r.text).join("\n\n");
+    const averageRating =
+      allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+
+    // Initialize Gemini model
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // Prepare the prompt
+    const prompt = `
+      Analyze these customer reviews for a product and extract key insights:
+
+      Reviews:
+      ${reviewTexts}
+
+      Average Rating: ${averageRating.toFixed(1)}/5
+
+      Your task:
+      1. Identify 3-5 most mentioned POSITIVE aspects (what customers liked)
+      2. Identify 3-5 most mentioned NEGATIVE aspects (what customers disliked)
+      3. Provide overall sentiment score (0-100)
+      4. Suggest 2-3 concrete improvement areas
+
+      Format your response as JSON exactly like this:
+      {
+        "positiveAspects": [
+          {"aspect": string, "mentions": number, "example": string},
+          ...
+        ],
+        "negativeAspects": [
+          {"aspect": string, "mentions": number, "example": string},
+          ...
+        ],
+        "sentimentScore": number,
+        "improvementSuggestions": [string, ...],
+        "summary": string
+      }
+    `;
+
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+
+    // Clean the response
+    text = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    let analysis;
+    try {
+      analysis = JSON.parse(text);
+    } catch (err) {
+      console.error("Failed to parse AI response:", text);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to parse AI analysis",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      analysis,
+      totalReviews: allReviews.length,
+      averageRating,
+    });
+  } catch (error) {
+    console.error("Review analysis error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to analyze reviews",
+      error: error.message,
+    });
+  }
+};
+
 // ------------------- Eco Verification -------------------
 export const verifyEcoClaim = async (req, res) => {
   try {
@@ -578,7 +704,9 @@ export const getSellerProducts = async (req, res) => {
 // ------------------- Public Product List -------------------
 export const listAllProducts = async (req, res) => {
   try {
-    const sellers = await Seller.find({ status: "verified" }).select("products");
+    const sellers = await Seller.find({ status: "verified" }).select(
+      "products"
+    );
     const allProducts = sellers.flatMap((s) =>
       s.products.map((p) => ({ ...p.toObject(), sellerId: s._id }))
     );
