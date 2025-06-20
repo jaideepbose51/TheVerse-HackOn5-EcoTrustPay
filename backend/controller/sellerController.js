@@ -149,6 +149,77 @@ export const verifyEcoClaim = async (req, res) => {
   }
 };
 
+export const getProductReviews = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const sellerId = req.user.id;
+
+    // 1. Find seller and verify product ownership
+    const seller = await Seller.findOne({
+      _id: sellerId,
+      "products._id": productId,
+    });
+
+    if (!seller) {
+      return res
+        .status(404)
+        .json({ message: "Product not found for this seller" });
+    }
+
+    // 2. Get the product object from seller's product list
+    const product = seller.products.find((p) => p._id.toString() === productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product details not found" });
+    }
+
+    // 3. Search through all catalogues and find matching product reviews
+    const catalogues = await Catalogue.find({}).populate(
+      "products.reviews.userId",
+      "name"
+    );
+
+    const matchingReviews = [];
+
+    catalogues.forEach((catalogue) => {
+      const matchedProduct = catalogue.products.find(
+        (p) => p.name === product.name
+      );
+
+      if (matchedProduct?.reviews?.length) {
+        matchingReviews.push(
+          ...matchedProduct.reviews.map((r) => ({
+            ...r.toObject(),
+            productName: product.name,
+            productImages: product.images,
+            catalogueId: catalogue._id,
+          }))
+        );
+      }
+    });
+
+    // 4. Return the matching reviews
+    res.status(200).json({
+      success: true,
+      reviews: matchingReviews.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      ),
+      productDetails: {
+        name: product.name,
+        price: product.price,
+        mainImage: product.images?.[0] || null,
+      },
+    });
+  } catch (error) {
+    console.error("Get reviews error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get reviews",
+      error: error.message,
+    });
+  }
+};
+
 // ------------------- Registration -------------------
 const sellerRegisterSchema = z.object({
   shopName: z.string().min(3),
@@ -597,9 +668,9 @@ export const replyToReview = async (req, res) => {
   }
 };
 
-// Get seller's product reviews
 export const getSellerReviews = async (req, res) => {
   try {
+    const { productId } = req.params;
     const sellerId = req.user.id;
 
     // Get all catalogues for this seller with populated reviews
@@ -607,20 +678,28 @@ export const getSellerReviews = async (req, res) => {
       .populate("products.reviews.userId", "name")
       .select("products");
 
-    // Extract all reviews from all products
-    const reviews = catalogues
-      .flatMap((catalogue) =>
-        catalogue.products.flatMap((product) =>
-          product.reviews.map((review) => ({
-            ...review.toObject(),
-            productId: product._id,
-            productName: product.name,
-            productImages: product.images,
-            catalogueId: catalogue._id,
-          }))
-        )
-      )
-      .sort((a, b) => b.createdAt - a.createdAt);
+    // Extract reviews for the specific product if productId is provided
+    let reviews = [];
+
+    catalogues.forEach((catalogue) => {
+      catalogue.products.forEach((product) => {
+        // If productId is specified, only get reviews for that product
+        if (!productId || product._id.toString() === productId) {
+          product.reviews.forEach((review) => {
+            reviews.push({
+              ...review.toObject(),
+              productId: product._id,
+              productName: product.name,
+              productImages: product.images,
+              catalogueId: catalogue._id,
+            });
+          });
+        }
+      });
+    });
+
+    // Sort by newest first
+    reviews.sort((a, b) => b.createdAt - a.createdAt);
 
     res.status(200).json({
       success: true,

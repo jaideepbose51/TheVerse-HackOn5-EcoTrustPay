@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
+  // State initialization
   const [activeTab, setActiveTab] = useState("details");
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(0);
@@ -13,23 +14,30 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reviewsLoading, setReviewsLoading] = useState(true);
 
-  // Debugging logs
+  // Debugging - log the received props
   useEffect(() => {
-    console.log("Component mounted with:", {
+    console.log("ProductTabs initialized with:", {
       productId,
       catalogueId,
-      token: !!token,
+      hasDetails: !!details,
+      hasSpecs: !!specifications,
     });
   }, []);
 
-  const fetchReviews = async () => {
+  // Fetch reviews with error handling and retry logic
+  const fetchReviews = async (retryCount = 0) => {
     if (!productId || !catalogueId) {
-      console.error("Missing required IDs for fetching reviews");
+      console.error("Cannot fetch reviews - missing IDs:", {
+        productId,
+        catalogueId,
+      });
+      setReviewsLoading(false);
       return;
     }
 
     setReviewsLoading(true);
     try {
+      console.log("Fetching reviews for product:", productId);
       const response = await axios.get(
         `${
           import.meta.env.VITE_BACKEND_URL
@@ -39,14 +47,28 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
           timeout: 8000,
         }
       );
-      setReviews(response.data?.reviews || []);
+
+      if (response.data?.reviews) {
+        setReviews(response.data.reviews);
+      } else {
+        throw new Error("Invalid reviews data structure");
+      }
     } catch (error) {
       console.error("Failed to fetch reviews:", {
+        error: error.message,
         status: error.response?.status,
         data: error.response?.data,
-        config: error.config,
       });
-      toast.error("Could not load reviews");
+
+      // Retry up to 2 times
+      if (retryCount < 2) {
+        const delay = (retryCount + 1) * 1500; // 1.5s, then 3s
+        console.log(`Retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return fetchReviews(retryCount + 1);
+      }
+
+      toast.error("Could not load reviews. Please refresh the page.");
     } finally {
       setReviewsLoading(false);
     }
@@ -56,77 +78,89 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
     fetchReviews();
   }, [productId, catalogueId]);
 
+  // Comprehensive validation
   const validateReview = () => {
-    if (!productId || !catalogueId) {
-      toast.error("Product information is incomplete");
-      return false;
-    }
+    const errors = [];
 
-    if (!token) {
-      toast.info("Please login to submit a review");
-      return false;
-    }
+    if (!productId) errors.push("Product ID is missing");
+    if (!catalogueId) errors.push("Catalogue ID is missing");
+    if (!rating) errors.push("Please select a rating");
+    if (!reviewTitle.trim()) errors.push("Please enter a title");
+    if (reviewTitle.trim().length < 5) errors.push("Title is too short");
+    if (!reviewComment.trim()) errors.push("Please enter your review");
+    if (reviewComment.trim().length < 10) errors.push("Review is too short");
+    if (!token) errors.push("Please login to submit a review");
 
-    if (!rating) {
-      toast.error("Please select a rating");
-      return false;
-    }
-
-    if (!reviewTitle.trim()) {
-      toast.error("Please enter a review title");
-      return false;
-    }
-
-    if (!reviewComment.trim()) {
-      toast.error("Please enter your review");
-      return false;
-    }
-
-    return true;
+    return {
+      isValid: errors.length === 0,
+      errors,
+    };
   };
 
+  // Submit review with full error handling
   const handleSubmitReview = async () => {
-    if (!validateReview()) return;
+    const validation = validateReview();
+    if (!validation.isValid) {
+      validation.errors.forEach((err) => toast.error(err));
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
+      const payload = {
+        productId,
+        catalogueId,
+        rating,
+        title: reviewTitle.trim(),
+        comment: reviewComment.trim(),
+      };
+
+      console.log("Submitting review:", payload);
+
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/user/review`,
-        {
-          productId,
-          catalogueId,
-          rating,
-          title: reviewTitle,
-          comment: reviewComment,
-        },
+        payload,
         {
           ...getAuthHeaders(),
           timeout: 10000,
         }
       );
 
-      if (response.data.success) {
+      console.log("Review submission response:", response.data);
+
+      if (response.data?.review) {
         setReviews([response.data.review, ...reviews]);
         setRating(0);
         setReviewTitle("");
         setReviewComment("");
-        toast.success("Review submitted successfully!");
+        toast.success("Thank you for your review!");
       } else {
-        throw new Error(response.data.message || "Failed to submit review");
+        throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error("Review submission error:", error);
+      console.error("Review submission failed:", {
+        error: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        config: error.config,
+      });
 
-      let errorMessage = "Failed to submit review. Please try again.";
+      let errorMessage = "Failed to submit review";
       if (error.response) {
-        if (error.response.status === 400) {
-          errorMessage = error.response.data.message || "Invalid review data";
-        } else if (error.response.status === 403) {
-          errorMessage = "You must purchase this product before reviewing";
+        if (error.response.status === 401) {
+          errorMessage = "Please login to submit a review";
+        } else if (error.response.status === 400) {
+          errorMessage = error.response.data?.message || "Invalid review data";
         } else if (error.response.status === 404) {
           errorMessage = "Product not found";
+        } else if (error.response.status === 500) {
+          errorMessage = "Server error. Please try again later.";
         }
+      } else if (error.code === "ECONNABORTED") {
+        errorMessage = "Request timed out. Please check your connection.";
+      } else if (error.message.includes("Network Error")) {
+        errorMessage = "Network error. Please check your internet connection.";
       }
 
       toast.error(errorMessage);
@@ -135,16 +169,18 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
     }
   };
 
-  // ... rest of your component (tabs UI) remains the same ...
+  // Tab configuration
+  const tabs = [
+    { id: "details", label: "Product Details" },
+    { id: "specs", label: "Specifications" },
+    { id: "reviews", label: `Reviews (${reviews.length})` },
+  ];
+
   return (
     <div className="w-full">
       {/* Tab Navigation */}
       <div className="flex border-b border-gray-200">
-        {[
-          { id: "details", label: "Product Details" },
-          { id: "specs", label: "Specifications" },
-          { id: "reviews", label: `Reviews (${reviews.length})` },
-        ].map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -193,23 +229,28 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
             {/* Review Form */}
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-medium mb-3">Write a Review</h3>
+
+              {/* Rating Input */}
               <div className="mb-3">
                 <label className="block mb-1">Rating</label>
-                <div className="flex">
+                <div className="flex space-x-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setRating(star)}
-                      className={`text-2xl focus:outline-none ${
+                      className={`text-2xl focus:outline-none transition-colors ${
                         rating >= star ? "text-yellow-400" : "text-gray-300"
                       }`}
+                      aria-label={`Rate ${star} star${star !== 1 ? "s" : ""}`}
                     >
                       ★
                     </button>
                   ))}
                 </div>
               </div>
+
+              {/* Title Input */}
               <div className="mb-3">
                 <label className="block mb-1">Title</label>
                 <input
@@ -221,7 +262,9 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
                   maxLength={100}
                 />
               </div>
-              <div className="mb-3">
+
+              {/* Comment Input */}
+              <div className="mb-4">
                 <label className="block mb-1">Review</label>
                 <textarea
                   value={reviewComment}
@@ -232,17 +275,19 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
                   maxLength={500}
                 ></textarea>
               </div>
+
+              {/* Submit Button */}
               <button
                 onClick={handleSubmitReview}
                 disabled={isSubmitting}
-                className={`px-4 py-2 rounded font-medium transition-colors ${
+                className={`w-full px-4 py-2 rounded font-medium transition-colors flex items-center justify-center ${
                   isSubmitting
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-primary text-white hover:bg-primary-dark"
                 }`}
               >
                 {isSubmitting ? (
-                  <span className="flex items-center justify-center">
+                  <>
                     <svg
                       className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                       xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +309,7 @@ const ProductTabs = ({ productId, catalogueId, details, specifications }) => {
                       ></path>
                     </svg>
                     Submitting...
-                  </span>
+                  </>
                 ) : (
                   "Submit Review"
                 )}

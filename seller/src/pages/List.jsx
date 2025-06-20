@@ -32,22 +32,24 @@ const List = ({ token }) => {
 
   const fetchProductReviews = async (productId) => {
     try {
-      const response = await axios.get(`${backendUrl}/api/seller/reviews`, {
-        headers: { Authorization: token },
-      });
+      const response = await axios.get(
+        `${backendUrl}/api/seller/products/${productId}/reviews`,
+        {
+          headers: { Authorization: token },
+          params: { t: Date.now() }, // Cache busting
+        }
+      );
 
-      if (response.data.success) {
-        // Filter reviews for the selected product
-        const productReviews = response.data.reviews.filter(
-          (review) => review.productId === productId
-        );
-        setReviews(productReviews);
+      console.log("Reviews response:", response.data);
+
+      if (response.data?.success) {
+        setReviews(response.data.reviews);
       } else {
-        toast.error(response.data.message);
+        toast.error(response.data?.message || "Failed to load reviews");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to fetch reviews");
+      console.error("Fetch error:", error);
+      toast.error("Error loading reviews");
     }
   };
 

@@ -12,8 +12,10 @@ import {
   getSellerById,
   getSellerReviews,
   replyToReview,
+  getProductReviews,
 } from "../controller/sellerController.js";
 import { isSeller } from "../middleware/auth.js";
+import { validateObjectId } from "../middleware/validateObjectId.js";
 
 const router = express.Router();
 
@@ -55,6 +57,23 @@ router.post(
   isSeller,
   replyToReview
 );
+
+// Route for all reviews
 router.get("/reviews", isSeller, getSellerReviews);
+
+// Route for specific product reviews
+router.get("/reviews/:productId", isSeller, getSellerReviews);
+
+// In sellerRoute.js
+router.get(
+  "/products/:productId/reviews",
+  isSeller,
+  validateObjectId("productId"),
+  (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+  },
+  getProductReviews
+);
 
 export default router;
