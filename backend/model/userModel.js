@@ -76,6 +76,25 @@ const userSchema = new mongoose.Schema(
     image: { type: String, default: "data:image/png;base64,..." },
     address: { type: addressSchema, default: () => ({}) },
     phone: { type: String, required: true },
+    reviews: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Catalogue.products",
+          required: true,
+        },
+        catalogueId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Catalogue",
+          required: true,
+        },
+        rating: { type: Number, required: true, min: 1, max: 5 },
+        title: { type: String, required: true, maxlength: 100 },
+        comment: { type: String, required: true, maxlength: 500 },
+        images: [String],
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     cart: [
       {
         productId: {

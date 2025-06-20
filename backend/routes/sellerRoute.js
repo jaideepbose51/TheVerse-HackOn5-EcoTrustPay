@@ -10,6 +10,8 @@ import {
   listAllProducts,
   verifyEcoClaim, // Add this import
   getSellerById,
+  getSellerReviews,
+  replyToReview,
 } from "../controller/sellerController.js";
 import { isSeller } from "../middleware/auth.js";
 
@@ -46,5 +48,13 @@ router.get("/profile/:id", getSellerById); // Public or protected, your choice
 
 // Public product listing route
 router.get("/product/public", listAllProducts);
+
+// sellerRoute.js - Add these new routes
+router.post(
+  "/review/reply/:catalogueId/:productId/:reviewId",
+  isSeller,
+  replyToReview
+);
+router.get("/reviews", isSeller, getSellerReviews);
 
 export default router;

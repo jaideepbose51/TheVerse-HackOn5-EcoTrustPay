@@ -262,9 +262,10 @@ const ProductPage = () => {
           {/* Product Details */}
           <div className="border-t pt-6">
             <ProductTabs
+              productId={product.productId}
+              catalogueId={product.catalogueId}
               details={product.details}
               specifications={product.specifications}
-              reviews={product.reviews}
             />
           </div>
         </div>

@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const BASE_URL = "https://theverse-hackon5-ecotrustpay-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SellerDetail = () => {
   const { id } = useParams();
@@ -13,7 +13,7 @@ const SellerDetail = () => {
     const fetchSeller = async () => {
       try {
         const token = localStorage.getItem("admin_token");
-        const res = await axios.get(`${BASE_URL}/seller/profile/${id}`, {
+        const res = await axios.get(`${BASE_URL}/api/seller/profile/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -37,7 +37,9 @@ const SellerDetail = () => {
       <h2 className="text-2xl font-bold mb-4">{seller.shopName}</h2>
       <p className="mb-2 text-gray-600">Email: {seller.email}</p>
       <p className="mb-2 text-gray-600">Phone: {seller.phone || "N/A"}</p>
-      <p className="mb-2 text-gray-600 capitalize">Seller Type: {seller.sellerType}</p>
+      <p className="mb-2 text-gray-600 capitalize">
+        Seller Type: {seller.sellerType}
+      </p>
       <p className="mb-2 text-gray-600">Status: {seller.status}</p>
       <p className="mb-4 text-gray-600">
         Categories: {seller.categories.join(", ")}

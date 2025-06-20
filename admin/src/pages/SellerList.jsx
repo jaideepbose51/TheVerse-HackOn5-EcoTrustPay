@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-const BASE_URL = "https://theverse-hackon5-ecotrustpay-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SellerList = () => {
   const [sellers, setSellers] = useState([]);
@@ -15,7 +15,7 @@ const SellerList = () => {
     if (!token) return toast.error("Admin not logged in");
 
     try {
-      const res = await axios.get(`${BASE_URL}/admin/sellers`, {
+      const res = await axios.get(`${BASE_URL}/api/admin/sellers`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

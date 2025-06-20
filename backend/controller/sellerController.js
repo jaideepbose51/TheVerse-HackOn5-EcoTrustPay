@@ -545,3 +545,92 @@ export const getSellerById = async (req, res) => {
     });
   }
 };
+
+// sellerController.js - Add these new controller functions
+
+// Seller replies to a review
+export const replyToReview = async (req, res) => {
+  try {
+    const { catalogueId, productId, reviewId } = req.params;
+    const { replyText } = req.body;
+    const sellerId = req.user.id;
+
+    // Verify the seller owns the product
+    const catalogue = await Catalogue.findOne({
+      _id: catalogueId,
+      seller: sellerId,
+      "products._id": productId,
+    });
+
+    if (!catalogue) {
+      return res.status(404).json({
+        message: "Product not found or you don't have permission",
+      });
+    }
+
+    const product = catalogue.products.id(productId);
+    const review = product.reviews.id(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    // Add seller reply
+    review.sellerReply = {
+      text: replyText,
+      repliedAt: new Date(),
+    };
+
+    await catalogue.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Reply added successfully",
+      review,
+    });
+  } catch (error) {
+    console.error("Reply to review error:", error);
+    res.status(500).json({
+      message: "Failed to add reply",
+      error: error.message,
+    });
+  }
+};
+
+// Get seller's product reviews
+export const getSellerReviews = async (req, res) => {
+  try {
+    const sellerId = req.user.id;
+
+    // Get all catalogues for this seller with populated reviews
+    const catalogues = await Catalogue.find({ seller: sellerId })
+      .populate("products.reviews.userId", "name")
+      .select("products");
+
+    // Extract all reviews from all products
+    const reviews = catalogues
+      .flatMap((catalogue) =>
+        catalogue.products.flatMap((product) =>
+          product.reviews.map((review) => ({
+            ...review.toObject(),
+            productId: product._id,
+            productName: product.name,
+            productImages: product.images,
+            catalogueId: catalogue._id,
+          }))
+        )
+      )
+      .sort((a, b) => b.createdAt - a.createdAt);
+
+    res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    console.error("Get seller reviews error:", error);
+    res.status(500).json({
+      message: "Failed to get reviews",
+      error: error.message,
+    });
+  }
+};

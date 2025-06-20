@@ -574,3 +574,122 @@ export const getLatestProducts = async (req, res) => {
     });
   }
 };
+// userController.js - Add these new controller functions
+
+export const addReview = async (req, res) => {
+  try {
+    const { productId, catalogueId, rating, title, comment } = req.body;
+    const userId = req.user.id;
+
+    // Validate input
+    if (!productId || !catalogueId || !rating || !title || !comment) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Check if user has purchased the product
+    const user = await User.findById(userId);
+    const hasPurchased = user.orders.some((order) =>
+      order.products.some(
+        (p) =>
+          p.productId.toString() === productId &&
+          p.catalogueId.toString() === catalogueId
+      )
+    );
+
+    if (!hasPurchased) {
+      return res.status(403).json({
+        message: "You must purchase the product before reviewing",
+      });
+    }
+
+    // Check for existing review
+    const catalogue = await Catalogue.findOne({
+      _id: catalogueId,
+      "products._id": productId,
+    });
+
+    if (!catalogue) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const product = catalogue.products.id(productId);
+    const hasReviewed = product.reviews.some(
+      (r) => r.userId.toString() === userId
+    );
+
+    if (hasReviewed) {
+      return res.status(400).json({
+        message: "You've already reviewed this product",
+      });
+    }
+
+    // Create new review
+    const newReview = {
+      userId,
+      rating,
+      title,
+      comment,
+      isVerifiedPurchase: true,
+      createdAt: new Date(),
+    };
+
+    // Add to product reviews
+    product.reviews.push(newReview);
+
+    // Save without validating the entire catalogue
+    await catalogue.save({ validateBeforeSave: false });
+
+    // Also add to user's review history
+    user.reviews.push({
+      productId,
+      catalogueId,
+      rating,
+      title,
+      comment,
+      createdAt: new Date(),
+    });
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Review added successfully",
+      review: newReview,
+    });
+  } catch (error) {
+    console.error("Add review error:", error);
+    res.status(500).json({
+      message: "Failed to add review",
+      error: error.message,
+    });
+  }
+};
+
+// Get product reviews
+export const getProductReviews = async (req, res) => {
+  try {
+    const { productId, catalogueId } = req.params;
+
+    const catalogue = await Catalogue.findOne({
+      _id: catalogueId,
+      "products._id": productId,
+    }).populate("products.reviews.userId", "name");
+
+    if (!catalogue) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const product = catalogue.products.id(productId);
+    const reviews = product.reviews.sort((a, b) => b.createdAt - a.createdAt);
+
+    res.status(200).json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
+    console.error("Get reviews error:", error);
+    res.status(500).json({
+      message: "Failed to get reviews",
+      error: error.message,
+    });
+  }
+};

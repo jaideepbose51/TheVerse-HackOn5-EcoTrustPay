@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-const BASE_URL = "https://theverse-hackon5-ecotrustpay-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const PendingSellers = () => {
   const [pendingSellers, setPendingSellers] = useState([]);
@@ -11,11 +11,14 @@ const PendingSellers = () => {
   const fetchPendingSellers = async () => {
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await axios.get(`${BASE_URL}/admin/sellers/pending`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/api/admin/sellers/pending`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (Array.isArray(response.data)) {
         setPendingSellers(response.data);
@@ -64,7 +67,9 @@ const PendingSellers = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Pending Sellers for Verification</h2>
+      <h2 className="text-xl font-bold mb-4">
+        Pending Sellers for Verification
+      </h2>
 
       {pendingSellers.length === 0 ? (
         <p className="text-gray-500">No pending sellers found.</p>

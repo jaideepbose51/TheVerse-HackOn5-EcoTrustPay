@@ -13,6 +13,8 @@ import {
   getLatestProducts,
   getNearbyOrders,
   getUserEcoStats,
+  addReview,
+  getProductReviews,
 } from "../controller/userController.js";
 import authUser from "../middleware/authUser.js";
 
@@ -44,5 +46,9 @@ userRouter.get("/products/latest", getLatestProducts);
 // 🌱 Eco features
 userRouter.get("/orders/nearby", authUser, getNearbyOrders);
 userRouter.get("/eco-stats", authUser, getUserEcoStats);
+
+// userRoute.js - Add these new routes
+userRouter.post("/review", authUser, addReview);
+userRouter.get("/reviews/product/:catalogueId/:productId", getProductReviews);
 
 export default userRouter;

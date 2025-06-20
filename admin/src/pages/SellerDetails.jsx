@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const BASE_URL = "https://theverse-hackon5-ecotrustpay-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SellerDetails = () => {
   const { sellerId } = useParams();
@@ -14,7 +14,7 @@ const SellerDetails = () => {
     const fetchSeller = async () => {
       try {
         const response = await axios.get(
-          `${BASE_URL}/admin/sellers/${sellerId}`,
+          `${BASE_URL}/api/admin/sellers/${sellerId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
