@@ -507,9 +507,7 @@ export const getSellerProducts = async (req, res) => {
 // ------------------- Public Product List -------------------
 export const listAllProducts = async (req, res) => {
   try {
-    const sellers = await Seller.find({ status: "verified" }).select(
-      "products"
-    );
+    const sellers = await Seller.find({ status: "verified" }).select("products");
     const allProducts = sellers.flatMap((s) =>
       s.products.map((p) => ({ ...p.toObject(), sellerId: s._id }))
     );

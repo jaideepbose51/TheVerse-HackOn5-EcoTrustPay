@@ -90,6 +90,9 @@ export const blockSeller = async (req, res) => {
     seller.status = "blocked";
     await seller.save();
 
+    // Optionally: You could also archive or hide the seller's catalogues
+    // await Catalogue.updateMany({ seller: sellerId }, { isActive: false });
+
     res.json({ success: true, message: "Seller blocked successfully", seller });
   } catch (err) {
     console.error("Block Seller Error:", err);

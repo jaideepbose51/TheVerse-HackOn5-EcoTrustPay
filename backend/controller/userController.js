@@ -497,10 +497,19 @@ export const getUserEcoStats = async (req, res) => {
 // Updated getAllProducts function
 export const getAllProducts = async (req, res) => {
   try {
-    const catalogues = await Catalogue.find().populate("seller", "name");
+    const catalogues = await Catalogue.find()
+      .populate({
+        path: "seller",
+        select: "name status", // Include status in the populated data
+        match: { status: "verified" } // Only include verified sellers
+      });
+
     const allProducts = [];
 
     catalogues.forEach((catalogue) => {
+      // Skip if seller is not populated (meaning seller is not verified)
+      if (!catalogue.seller) return;
+
       catalogue.products.forEach((product) => {
         allProducts.push({
           productId: product._id,
@@ -537,6 +546,16 @@ export const getLatestProducts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 8;
 
     const catalogues = await Catalogue.aggregate([
+      {
+        $lookup: {
+          from: "sellers",
+          localField: "seller",
+          foreignField: "_id",
+          as: "sellerData"
+        }
+      },
+      { $unwind: "$sellerData" },
+      { $match: { "sellerData.status": "verified" } }, // Only include verified sellers
       { $unwind: "$products" },
       { $sort: { "products.createdAt": -1 } },
       { $limit: limit },
@@ -551,15 +570,10 @@ export const getLatestProducts = async (req, res) => {
           sellerId: "$seller",
           category: "$category",
           subCategory: "$subCategory",
+          sellerName: "$sellerData.shopName"
         },
       },
     ]);
-
-    // Populate seller info
-    await Catalogue.populate(catalogues, {
-      path: "sellerId",
-      select: "shopName",
-    });
 
     res.json({
       success: true,
