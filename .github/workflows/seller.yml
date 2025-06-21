@@ -2,10 +2,11 @@ name: Deploy Admin to S3
 
 on:
   push:
-    paths:
-      - 'seller/'
     branches:
       - main
+    paths:
+      - 'seller/**'
+
 
 jobs:
   deploy:
