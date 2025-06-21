@@ -125,12 +125,20 @@ const Navbar = () => {
           >
             HOME
           </NavLink>
+
           <NavLink
             className="py-2 pl-6 border"
             to="/collection"
             onClick={() => setVisible(false)}
           >
             COLLECTION
+          </NavLink>
+          <NavLink
+            className="py-2 pl-6 border"
+            to="/verifieddashboard"
+            onClick={() => setVisible(false)}
+          >
+            GREEN DASHBOARD
           </NavLink>
           <NavLink
             className="py-2 pl-6 border"

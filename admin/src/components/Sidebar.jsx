@@ -18,14 +18,7 @@ const Sidebar = () => {
           to="/add"
         >
           <img className="w-5 h-5" src={assets.add_icon} alt="Add" />
-          <p className="hidden md:block">Verify Sellers</p>
-        </NavLink>
-        <NavLink
-          className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l"
-          to="/sellers"
-        >
-          <img className="w-5 h-5" src={assets.parcel_icon} alt="Add" />
-          <p className="hidden md:block">Sellers</p>
+          <p className="hidden md:block">Verified Sellers</p>
         </NavLink>
         <NavLink
           className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l"

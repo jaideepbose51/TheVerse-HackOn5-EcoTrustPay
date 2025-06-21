@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SellerList from "./pages/SellerList";
-import SellerDetails from "./pages/SellerDetails";
+import SellerDetails from "./pages/SellerDetail";
 import PendingSellers from "./pages/PendingSellers";
 import SellerDetail from "./pages/SellerDetail";
 
