@@ -1,44 +1,13 @@
-name: Deploy Admin to S3
+- name: List dist folder before deploy
+  run: ls -R admin/dist
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'admin/**'
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Create .env file
-        working-directory: admin
-        run: |
-          echo "VITE_BACKEND_URL=${{ secrets.VITE_ADMIN_BACKEND_URL }}" > .env
-
-      - name: Install dependencies
-        working-directory: admin
-        run: npm install
-
-      - name: Build the app
-        working-directory: admin
-        run: npm run build
-
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --delete
-        env:
-          AWS_S3_BUCKET: ${{ secrets.ADMIN_BUCKET_NAME }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: admin/dist
+- name: Deploy to S3
+  uses: jakejarvis/s3-sync-action@master
+  with:
+    args: --delete
+  env:
+    AWS_S3_BUCKET: ${{ secrets.ADMIN_BUCKET_NAME }}
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    AWS_REGION: ${{ secrets.AWS_REGION }}
+    SOURCE_DIR: admin/dist
