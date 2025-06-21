@@ -10,21 +10,26 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: admin
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
       - name: Create .env file
+        working-directory: admin
         run: |
-          echo "VITE_BACKEND_URL=${{ secrets.VITE_ADMIN_BACKEND_URL }}" >> .env
+          echo "VITE_BACKEND_URL=${{ secrets.VITE_ADMIN_BACKEND_URL }}" > .env
 
       - name: Install dependencies
+        working-directory: admin
         run: npm install
 
       - name: Build the app
+        working-directory: admin
         run: npm run build
 
       - name: Deploy to S3
@@ -36,4 +41,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          SOURCE_DIR: build
+          SOURCE_DIR: admin/build
