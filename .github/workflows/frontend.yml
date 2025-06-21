@@ -2,10 +2,11 @@ name: Deploy Frontend to S3
 
 on:
   push:
-    paths:
-      - 'frontend/'
     branches:
       - main
+    paths:
+      - 'frontend/**'
+
 
 jobs:
   deploy:
