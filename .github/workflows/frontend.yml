@@ -19,8 +19,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
-          echo "REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}" >> .env
+          echo "VITE_BACKEND_URL=${{ secrets.VITE_FRONTEND_BACKEND_URL }}" >> .env
 
       - name: Install dependencies
         run: npm install
