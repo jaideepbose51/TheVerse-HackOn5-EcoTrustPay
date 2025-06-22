@@ -496,8 +496,7 @@ const VerifiedDashboard = () => {
               <h3 className="font-medium">Eco Products</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Earn <strong>1 point per ₹10</strong> spent on eco-friendly
-              products
+              Earn <strong>50 points</strong>by ordering eco-friendly products
             </p>
           </div>
           <div className="p-3 border border-blue-100 rounded-lg bg-blue-50">
