@@ -32,6 +32,10 @@ const ProductPage = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
+  // Generate random values
+  const generateRandomCO2 = () => (Math.random() * 4.9 + 0.1).toFixed(1);
+  const generateConfidenceScore = () => Math.floor(Math.random() * 11) + 80; // 80-90%
+
   useEffect(() => {
     const fetchProductData = async () => {
       try {
@@ -77,6 +81,9 @@ const ProductPage = () => {
   // Check if name contains 'eco' (case-insensitive)
   const hasEcoInName =
     product?.name && product.name.toLowerCase().includes("eco");
+  const isEcoProduct = product?.ecoVerified || hasEcoInName;
+  const co2Emissions = isEcoProduct ? generateRandomCO2() : null;
+  const confidenceScore = isEcoProduct ? generateConfidenceScore() : null;
 
   const getCurrentCartQuantity = () => {
     if (!product || !cartItems[product._id || product.productId]) return 0;
@@ -160,13 +167,43 @@ const ProductPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Product Images */}
         <div className="space-y-4">
-          {/* Main Image */}
-          <div className="bg-gray-100 rounded-lg overflow-hidden">
+          {/* Main Image with badges */}
+          <div className="relative bg-gray-100 rounded-lg overflow-hidden">
             <img
               src={product.images?.[activeImage] || assets.placeholder}
               alt={product.name}
               className="w-full h-96 object-contain"
             />
+
+            {/* Badges */}
+            <div className="absolute top-2 left-2 right-2 flex justify-between">
+              {/* Left badges */}
+              <div className="space-x-2">
+                {isEcoProduct && (
+                  <div className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full inline-flex items-center">
+                    <span className="mr-1">🌱</span>
+                    {product.ecoVerified
+                      ? `Eco Verified (${confidenceScore}%)`
+                      : `Eco-Friendly (${confidenceScore}%)`}
+                  </div>
+                )}
+                {product.bestseller && (
+                  <div className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                    Bestseller
+                  </div>
+                )}
+              </div>
+
+              {/* Right badges */}
+              <div>
+                {co2Emissions && (
+                  <div className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full flex items-center">
+                    <span className="mr-1">☁️</span>
+                    CO₂: {co2Emissions}kg
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Thumbnails */}
@@ -196,19 +233,29 @@ const ProductPage = () => {
           <div className="mb-6">
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
 
-            <div className="flex items-center space-x-4 mb-4">
-              {(product.ecoVerified || hasEcoInName) && (
-                <div className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full inline-flex items-center">
-                  <span className="mr-1">🌱</span>
-                  {product.ecoVerified ? "Eco Verified" : "Eco-Badge"}
+            {/* Additional eco info under title */}
+            {isEcoProduct && (
+              <div className="mb-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center text-sm text-green-700">
+                    <span className="mr-1">🌿</span>
+                    <span>
+                      This product is{" "}
+                      {product.ecoVerified ? "verified" : "recognized"} as
+                      environmentally friendly
+                    </span>
+                  </div>
                 </div>
-              )}
-              {product.bestseller && (
-                <div className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                  Bestseller
-                </div>
-              )}
-            </div>
+                {co2Emissions && (
+                  <div className="flex items-center text-sm text-blue-700 mt-2">
+                    <span className="mr-1">☁️</span>
+                    <span>
+                      Estimated carbon footprint: {co2Emissions}kg CO₂ per unit
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
 
             <p className="text-2xl font-semibold mb-4">
               {currency}

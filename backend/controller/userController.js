@@ -497,12 +497,11 @@ export const getUserEcoStats = async (req, res) => {
 // Updated getAllProducts function
 export const getAllProducts = async (req, res) => {
   try {
-    const catalogues = await Catalogue.find()
-      .populate({
-        path: "seller",
-        select: "name status", // Include status in the populated data
-        match: { status: "verified" } // Only include verified sellers
-      });
+    const catalogues = await Catalogue.find().populate({
+      path: "seller",
+      select: "name status", // Include status in the populated data
+      match: { status: "verified" }, // Only include verified sellers
+    });
 
     const allProducts = [];
 
@@ -551,8 +550,8 @@ export const getLatestProducts = async (req, res) => {
           from: "sellers",
           localField: "seller",
           foreignField: "_id",
-          as: "sellerData"
-        }
+          as: "sellerData",
+        },
       },
       { $unwind: "$sellerData" },
       { $match: { "sellerData.status": "verified" } }, // Only include verified sellers
@@ -570,7 +569,7 @@ export const getLatestProducts = async (req, res) => {
           sellerId: "$seller",
           category: "$category",
           subCategory: "$subCategory",
-          sellerName: "$sellerData.shopName"
+          sellerName: "$sellerData.shopName",
         },
       },
     ]);
