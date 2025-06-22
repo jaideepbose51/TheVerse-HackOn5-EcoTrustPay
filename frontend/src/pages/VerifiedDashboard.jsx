@@ -496,7 +496,7 @@ const VerifiedDashboard = () => {
               <h3 className="font-medium">Eco Products</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Earn <strong>50 points</strong>by ordering eco-friendly products
+              Earn <strong>25 points</strong> by ordering eco-friendly products
             </p>
           </div>
           <div className="p-3 border border-blue-100 rounded-lg bg-blue-50">
@@ -507,7 +507,7 @@ const VerifiedDashboard = () => {
               <h3 className="font-medium">Group Orders</h3>
             </div>
             <p className="text-sm text-gray-600">
-              Get <strong>50 bonus points</strong> for joining a group delivery
+              Get <strong>25 bonus points</strong> for joining a group delivery
             </p>
           </div>
           <div className="p-3 border border-purple-100 rounded-lg bg-purple-50">
