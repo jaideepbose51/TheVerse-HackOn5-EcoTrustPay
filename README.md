@@ -6,10 +6,10 @@
 
 **A single system to verify eco-claims, prevent fraud, and validate green purchases**
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-frontend.onrender.com/)
-[![Frontend Demo](https://img.shields.io/badge/Frontend-Demo-blue?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-frontend.onrender.com/)
-[![Seller Portal](https://img.shields.io/badge/Seller-Portal-orange?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-seller.onrender.com/)
-[![Admin Dashboard](https://img.shields.io/badge/Admin-Dashboard-red?style=for-the-badge)](https://theverse-hackon5-ecotrustpay-admin.onrender.com/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](http://theverse-frontend.s3-website-us-east-1.amazonaws.com/)
+[![Frontend Demo](https://img.shields.io/badge/Frontend-Demo-blue?style=for-the-badge)](http://theverse-frontend.s3-website-us-east-1.amazonaws.com/)
+[![Seller Portal](https://img.shields.io/badge/Seller-Portal-orange?style=for-the-badge)](http://theverse-seller.s3-website-us-east-1.amazonaws.com/)
+[![Admin Dashboard](https://img.shields.io/badge/Admin-Dashboard-red?style=for-the-badge)](http://theverse-admin.s3-website-us-east-1.amazonaws.com/)
 
 </div>
 
@@ -19,12 +19,12 @@ EcoTrust Pay is a revolutionary sustainability-focused e-commerce platform that 
 
 ### 🔥 Live Platform Links
 
-| Platform             | Link                                                                          | Status  |
-| -------------------- | ----------------------------------------------------------------------------- | ------- |
-| 🛍️ **Customer App**  | [Shop Now](https://theverse-hackon5-ecotrustpay-frontend.onrender.com/)       | ✅ Live |
-| 🏪 **Seller Portal** | [Seller Dashboard](https://theverse-hackon5-ecotrustpay-seller.onrender.com/) | ✅ Live |
-| ⚙️ **Admin Panel**   | [Admin Dashboard](https://theverse-hackon5-ecotrustpay-admin.onrender.com/)   | ✅ Live |
-| 🔧 **API Backend**   | [API Docs](https://jaideepbose51.github.io/api-doc/)                          | ✅ Live |
+| Platform             | Link                                                                           | Status  |
+| -------------------- | ------------------------------------------------------------------------------ | ------- |
+| 🛍️ **Customer App**  | [Shop Now](http://theverse-frontend.s3-website-us-east-1.amazonaws.com/)       | ✅ Live |
+| 🏪 **Seller Portal** | [Seller Dashboard](http://theverse-seller.s3-website-us-east-1.amazonaws.com/) | ✅ Live |
+| ⚙️ **Admin Panel**   | [Admin Dashboard](http://theverse-admin.s3-website-us-east-1.amazonaws.com/)   | ✅ Live |
+| 🔧 **API Backend**   | [API Docs](https://jaideepbose51.github.io/api-doc/)                           | ✅ Live |
 
 ---
 
@@ -831,7 +831,7 @@ Our platform is built with sustainability in mind:
 
 _Last updated: June 19, 2025_
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
