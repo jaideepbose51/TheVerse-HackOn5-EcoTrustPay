@@ -821,7 +821,7 @@ Our platform is built with sustainability in mind:
 
 **EcoTrust Pay - Where Trust Isn't Assumed, It's Earned**
 
-[![Made with ❤️ and 🌱](https://img.shields.io/badge/Made%20with-❤️%20and%20🌱-brightgreen?style=for-the-badge)](https://github.com/yourusername/ecotrust-pay)
+[![Made with ❤️ and 🌱](https://img.shields.io/badge/Made%20with-❤️%20and%20🌱-brightgreen?style=for-the-badge)](https://github.com/jaideepbose51/TheVerse-HackOn5-EcoTrustPay)
 
 **Happy coding! 🎉 Let's build a more sustainable future together! 🌍**
 
